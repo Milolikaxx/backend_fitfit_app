@@ -1,0 +1,2 @@
+mysql:
+  dsn: "proj64_rhythm007:fitfit007@tcp(202.28.34.197:3306)/proj64_rhythm007?collation=utf8mb4_unicode_ci&parseTime=true"
