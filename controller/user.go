@@ -46,5 +46,5 @@ func registerAccount(ctx *gin.Context) {
 	user := model.User{}
 	ctx.ShouldBindJSON(&user)
 	err := userServ.Register(user)
-	ctx.JSON(http.StatusOK, err)
+	ctx.JSON(http.StatusCreated, err)
 }
