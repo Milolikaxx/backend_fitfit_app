@@ -22,6 +22,7 @@ func NewUserRepository() userRepository {
 type userRepository interface {
 	FindAll() ([]model.User, error)
 	Register(model.User) int64
+	FindByID(key int) (*model.User, error)
 	FindByEmail(key string) (*model.User, error)
 }
 
@@ -32,6 +33,14 @@ func (u userRepo) FindAll() ([]model.User, error) {
 		return nil, result.Error
 	}
 	return users, nil
+}
+func (u userRepo) FindByID(id int) (*model.User, error) {
+	user := model.User{}
+	result := u.db.Where("uid = ?", id).Find(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
 }
 
 func (u userRepo) FindByEmail(email string) (*model.User, error) {
