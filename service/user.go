@@ -19,6 +19,7 @@ var userRepo = repository.NewUserRepository()
 type UserService interface {
 	GetAllUsers() ([]model.User, error)
 	Register(model.User) int64
+	Login(model.User) *model.User
 	GetUserByID(key int) (*model.User, error)
 	GetUserByEmail(key string) (*model.User, error)
 }
@@ -47,6 +48,21 @@ func (u userServ) GetUserByEmail(email string) (*model.User, error) {
 	return user, nil
 }
 
+func (u userServ) Login(user model.User) *model.User {
+	usr, _ := userRepo.FindByEmail(user.Email)
+	if usr != nil {
+		if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(user.Password)) == nil {
+			log.Println("รหัสผ่านตรง")
+			return usr
+		} else {
+			log.Println("รหัสผ่านไม่ตรง")
+			return nil
+		}
+	} else {
+		log.Panicln("ไม่พบอีเมล")
+		return nil
+	}
+}
 func (u userServ) Register(user model.User) int64 {
 	usr, _ := userRepo.FindByEmail(user.Email)
 	if usr.Uid == 0 {
