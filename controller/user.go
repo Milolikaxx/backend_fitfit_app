@@ -4,6 +4,7 @@ import (
 	"backend_fitfit_app/model"
 	"backend_fitfit_app/service"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,7 @@ func NewUserController(router *gin.Engine) {
 	{
 		ping.GET("", getAllUser)
 		ping.GET("/ByEmail", getByEmail)
+		ping.GET(":id", getByID)
 		ping.POST("/register", registerAccount)
 	}
 }
@@ -29,7 +31,16 @@ func getAllUser(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, users)
 }
-
+func getByID(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	user, err := userServ.GetUserByID(id)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"error": err,
+		})
+	}
+	ctx.JSON(http.StatusOK, user)
+}
 func getByEmail(ctx *gin.Context) {
 	user := &model.User{}
 	ctx.ShouldBindJSON(&user)

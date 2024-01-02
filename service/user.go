@@ -19,6 +19,7 @@ var userRepo = repository.NewUserRepository()
 type UserService interface {
 	GetAllUsers() ([]model.User, error)
 	Register(model.User) int64
+	GetUserByID(key int) (*model.User, error)
 	GetUserByEmail(key string) (*model.User, error)
 }
 
@@ -28,6 +29,14 @@ func (u userServ) GetAllUsers() ([]model.User, error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+func (u userServ) GetUserByID(id int) (*model.User, error) {
+	user, err := userRepo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func (u userServ) GetUserByEmail(email string) (*model.User, error) {
