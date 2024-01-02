@@ -9,5 +9,6 @@ import (
 func StartServer() {
 	router := gin.Default()
 	controller.NewUserController(router)
+	controller.NewWpController(router)
 	router.Run()
 }

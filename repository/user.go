@@ -52,8 +52,8 @@ func (u userRepo) FindByEmail(email string) (*model.User, error) {
 	return &user, nil
 }
 
-func (u userRepo) Register(account model.User) int64 {
-	result := db.Create(&account)
+func (u userRepo) Register(user model.User) int64 {
+	result := u.db.Create(&user)
 	if result.RowsAffected > 0 {
 		log.Printf("Register complete\nAffected row : %v", result.RowsAffected)
 	} else {
