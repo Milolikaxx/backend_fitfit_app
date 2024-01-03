@@ -24,6 +24,7 @@ type userRepository interface {
 	Register(model.User) int64
 	FindByID(key int) (*model.User, error)
 	FindByEmail(key string) (*model.User, error)
+	UpdateUser(model.User, int) int64
 }
 
 func (u userRepo) FindAll() ([]model.User, error) {
@@ -34,6 +35,7 @@ func (u userRepo) FindAll() ([]model.User, error) {
 	}
 	return users, nil
 }
+
 func (u userRepo) FindByID(id int) (*model.User, error) {
 	user := model.User{}
 	result := u.db.Where("uid = ?", id).Find(&user)
@@ -58,6 +60,16 @@ func (u userRepo) Register(user model.User) int64 {
 		log.Printf("Register complete\nAffected row : %v", result.RowsAffected)
 	} else {
 		log.Printf("Register failed %v", result.RowsAffected)
+	}
+	return result.RowsAffected
+}
+
+func (u userRepo) UpdateUser(user model.User, id int) int64 {
+	result := u.db.Model(&model.User{}).Where("uid = ?", id).Updates(&user)
+	if result.RowsAffected > 0 {
+		log.Printf("Update User complete\nAffected row : %v", result.RowsAffected)
+	} else {
+		log.Printf("Update User failed\nAffected row : %v", result.RowsAffected)
 	}
 	return result.RowsAffected
 }

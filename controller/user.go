@@ -19,6 +19,7 @@ func NewUserController(router *gin.Engine) {
 		ping.GET(":id", getByID)
 		ping.POST("/register", register)
 		ping.POST("/login", login)
+		ping.PUT("/update/:id", UpdateUser)
 	}
 }
 
@@ -32,6 +33,7 @@ func getAllUser(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, users)
 }
+
 func getByID(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	user, err := userServ.GetUserByID(id)
@@ -42,6 +44,7 @@ func getByID(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, user)
 }
+
 func getByEmail(ctx *gin.Context) {
 	user := &model.User{}
 	ctx.ShouldBindJSON(&user)
@@ -66,4 +69,12 @@ func register(ctx *gin.Context) {
 	ctx.ShouldBindJSON(&user)
 	err := userServ.Register(user)
 	ctx.JSON(http.StatusCreated, err)
+}
+
+func UpdateUser(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	user := model.User{}
+	ctx.ShouldBindJSON(&user)
+	err := userServ.Update(user, id)
+	ctx.JSON(http.StatusOK, err)
 }

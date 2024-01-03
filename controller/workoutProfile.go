@@ -17,7 +17,7 @@ func NewWpController(router *gin.Engine) {
 		ping.GET("", getAllWp)
 		ping.GET(":id", getWpByID)
 		ping.POST("/save", Save)
-		// ping.PUT("/update/:id", Update)
+		ping.PUT("/update/:id", UpdateWorkProfile)
 	}
 }
 
@@ -30,6 +30,7 @@ func getAllWp(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, wps)
 }
+
 func getWpByID(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	user, err := wpServ.GetWpByID(id)
@@ -40,6 +41,7 @@ func getWpByID(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, user)
 }
+
 func Save(ctx *gin.Context) {
 	wp := model.WorkoutProfile{}
 	ctx.ShouldBindJSON(&wp)
@@ -47,10 +49,10 @@ func Save(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, err)
 }
 
-// func Update(ctx *gin.Context) {
-// 	id, _ := strconv.Atoi(ctx.Param("id"))
-// 	wp := model.WorkoutProfile{}
-// 	ctx.ShouldBindJSON(&wp)
-// 	err := wpServ.Update(id, wp)
-// 	ctx.JSON(http.StatusOK, err)
-// }
+func UpdateWorkProfile(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	wp := model.WorkoutProfile{}
+	ctx.ShouldBindJSON(&wp)
+	err := wpServ.Update(wp, id)
+	ctx.JSON(http.StatusOK, err)
+}

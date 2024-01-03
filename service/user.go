@@ -22,6 +22,7 @@ type UserService interface {
 	Login(model.User) *model.User
 	GetUserByID(key int) (*model.User, error)
 	GetUserByEmail(key string) (*model.User, error)
+	Update(model.User, int) int64
 }
 
 func (u userServ) GetAllUsers() ([]model.User, error) {
@@ -63,6 +64,7 @@ func (u userServ) Login(user model.User) *model.User {
 		return nil
 	}
 }
+
 func (u userServ) Register(user model.User) int64 {
 	usr, _ := userRepo.FindByEmail(user.Email)
 	if usr.Uid == 0 {
@@ -87,4 +89,15 @@ func hashPassword(pwd string) string {
 		log.Println(err)
 	}
 	return string(hash)
+}
+
+func (u userServ) Update(user model.User, id int) int64 {
+	rowsAff := userRepo.UpdateUser(user, id)
+	if rowsAff > 0 {
+		return 1
+	} else if rowsAff == 0 {
+		return 0
+	} else {
+		return -1
+	}
 }
