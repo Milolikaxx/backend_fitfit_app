@@ -10,5 +10,6 @@ func StartServer() {
 	router := gin.Default()
 	controller.NewUserController(router)
 	controller.NewWpController(router)
+	controller.NewPlaylistController(router)
 	router.Run()
 }

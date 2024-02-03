@@ -12,6 +12,8 @@ type User struct {
 	Password     string    `gorm:"column:password;NOT NULL"`
 	ImageProfile string    `gorm:"column:image_profile"`
 	GoogleID     string    `gorm:"column:google_id"`
+	CreatedAt    time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP;NOT NULL"`
+	UpdatedAt    time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP;NOT NULL"`
 }
 
 func (m *User) TableName() string {
