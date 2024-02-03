@@ -4,7 +4,7 @@ WORKDIR /app
 
 ARG CACHEBUST=0
 
-RUN git clone -b main https://github.com/Milolikaxx/backend_fitfit_app.git .
+RUN git clone -b main https://Milolikaxx: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@github.com/Milolikaxx/backend_fitfit_app.git .
 
 RUN go mod download
 
