@@ -20,7 +20,7 @@ type WpService interface {
 	Update(wp model.WorkoutProfile, id int) int64
 }
 
-func (w wpServ) GetAllWps() ([]model.WorkoutProfile, error) {
+func (wpServ) GetAllWps() ([]model.WorkoutProfile, error) {
 	wps, err := wpRepo.FindAll()
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func (w wpServ) GetAllWps() ([]model.WorkoutProfile, error) {
 	return wps, nil
 }
 
-func (w wpServ) GetWpByID(id int) (*model.WorkoutProfile, error) {
+func (wpServ) GetWpByID(id int) (*model.WorkoutProfile, error) {
 	wp, err := wpRepo.FindByID(id)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (w wpServ) GetWpByID(id int) (*model.WorkoutProfile, error) {
 	return wp, nil
 }
 
-func (w wpServ) Save(wp model.WorkoutProfile) int64 {
+func (wpServ) Save(wp model.WorkoutProfile) int64 {
 	rowsAff := wpRepo.AddWorkProfile(wp)
 	if rowsAff > 0 {
 		return 1
@@ -47,7 +47,7 @@ func (w wpServ) Save(wp model.WorkoutProfile) int64 {
 	}
 }
 
-func (w wpServ) Update(wp model.WorkoutProfile, id int) int64 {
+func (wpServ) Update(wp model.WorkoutProfile, id int) int64 {
 	rowsAff := wpRepo.UpdateWorkProfile(wp, id)
 	if rowsAff > 0 {
 		return 1

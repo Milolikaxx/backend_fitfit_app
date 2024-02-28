@@ -25,7 +25,7 @@ type UserService interface {
 	Update(model.User, int) int64
 }
 
-func (u userServ) GetAllUsers() ([]model.User, error) {
+func (userServ) GetAllUsers() ([]model.User, error) {
 	users, err := userRepo.FindAll()
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (u userServ) GetAllUsers() ([]model.User, error) {
 	return users, nil
 }
 
-func (u userServ) GetUserByID(id int) (*model.User, error) {
+func (userServ) GetUserByID(id int) (*model.User, error) {
 	user, err := userRepo.FindByID(id)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (u userServ) GetUserByID(id int) (*model.User, error) {
 	return user, nil
 }
 
-func (u userServ) GetUserByEmail(email string) (*model.User, error) {
+func (userServ) GetUserByEmail(email string) (*model.User, error) {
 	user, err := userRepo.FindByEmail(email)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (u userServ) GetUserByEmail(email string) (*model.User, error) {
 	return user, nil
 }
 
-func (u userServ) Login(user model.User) *model.User {
+func (userServ) Login(user model.User) *model.User {
 	usr, _ := userRepo.FindByEmail(user.Email)
 	if usr != nil {
 		if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(user.Password)) == nil {
@@ -65,7 +65,7 @@ func (u userServ) Login(user model.User) *model.User {
 	}
 }
 
-func (u userServ) Register(user model.User) int64 {
+func (userServ) Register(user model.User) int64 {
 	usr, _ := userRepo.FindByEmail(user.Email)
 	if usr.Uid == 0 {
 		pwdHash := hashPassword(user.Password)
@@ -91,7 +91,7 @@ func hashPassword(pwd string) string {
 	return string(hash)
 }
 
-func (u userServ) Update(user model.User, id int) int64 {
+func (userServ) Update(user model.User, id int) int64 {
 	rowsAff := userRepo.UpdateUser(user, id)
 	if rowsAff > 0 {
 		return 1
