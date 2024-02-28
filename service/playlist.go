@@ -20,7 +20,7 @@ type PlaylistService interface {
 	Update(playlist model.Playlist, id int) int64
 }
 
-func (p playlistServ) GetAllPlaylist() ([]model.Playlist, error) {
+func (playlistServ) GetAllPlaylist() ([]model.Playlist, error) {
 	playlist, err := playlistRepo.FindAll()
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func (p playlistServ) GetAllPlaylist() ([]model.Playlist, error) {
 	return playlist, nil
 }
 
-func (p playlistServ) GetByID(id int) (*model.Playlist, error) {
+func (playlistServ) GetByID(id int) (*model.Playlist, error) {
 	playlist, err := playlistRepo.FindByID(id)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (p playlistServ) GetByID(id int) (*model.Playlist, error) {
 	return playlist, nil
 }
 
-func (p playlistServ) Save(playlist model.Playlist) int64 {
+func (playlistServ) Save(playlist model.Playlist) int64 {
 	rowsAff := playlistRepo.AddPlaylist(playlist)
 	if rowsAff > 0 {
 		return 1
@@ -47,7 +47,7 @@ func (p playlistServ) Save(playlist model.Playlist) int64 {
 	}
 }
 
-func (p playlistServ) Update(playlist model.Playlist, id int) int64 {
+func (playlistServ) Update(playlist model.Playlist, id int) int64 {
 	rowsAff := playlistRepo.UpdatePlaylist(playlist, id)
 	if rowsAff > 0 {
 		return 1

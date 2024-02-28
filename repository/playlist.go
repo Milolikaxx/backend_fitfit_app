@@ -26,26 +26,26 @@ type playlistRepository interface {
 	UpdatePlaylist(model.Playlist, int) int64
 }
 
-func (p playlistRepo) FindAll() ([]model.Playlist, error) {
+func (playlistRepo) FindAll() ([]model.Playlist, error) {
 	playlist := []model.Playlist{}
-	result := p.db.Find(&playlist)
+	result := db.Find(&playlist)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return playlist, nil
 }
 
-func (p playlistRepo) FindByID(id int) (*model.Playlist, error) {
+func (playlistRepo) FindByID(id int) (*model.Playlist, error) {
 	playlist := model.Playlist{}
-	result := p.db.Where("pid = ?", id).Find(&playlist)
+	result := db.Where("pid = ?", id).Find(&playlist)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return &playlist, nil
 }
 
-func (p playlistRepo) AddPlaylist(playlist model.Playlist) int64 {
-	result := p.db.Create(&playlist)
+func (playlistRepo) AddPlaylist(playlist model.Playlist) int64 {
+	result := db.Create(&playlist)
 	if result.RowsAffected > 0 {
 		log.Printf("Add workoutProfile complete\nAffected row : %v", result.RowsAffected)
 	} else {
@@ -54,8 +54,8 @@ func (p playlistRepo) AddPlaylist(playlist model.Playlist) int64 {
 	return result.RowsAffected
 }
 
-func (u playlistRepo) UpdatePlaylist(playlist model.Playlist, id int) int64 {
-	result := u.db.Model(&model.Playlist{}).Where("pid = ?", id).Updates(&playlist)
+func (playlistRepo) UpdatePlaylist(playlist model.Playlist, id int) int64 {
+	result := db.Model(&model.Playlist{}).Where("pid = ?", id).Updates(&playlist)
 	if result.RowsAffected > 0 {
 		log.Printf("Update Playlist complete\nAffected row : %v", result.RowsAffected)
 	} else {
