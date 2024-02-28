@@ -36,26 +36,26 @@ func (u userRepo) FindAll() ([]model.User, error) {
 	return users, nil
 }
 
-func (u userRepo) FindByID(id int) (*model.User, error) {
+func (userRepo) FindByID(id int) (*model.User, error) {
 	user := model.User{}
-	result := u.db.Where("uid = ?", id).Find(&user)
+	result := db.Where("uid = ?", id).Find(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return &user, nil
 }
 
-func (u userRepo) FindByEmail(email string) (*model.User, error) {
+func (userRepo) FindByEmail(email string) (*model.User, error) {
 	user := model.User{}
-	result := u.db.Where("email = ?", email).Find(&user)
+	result := db.Where("email = ?", email).Find(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return &user, nil
 }
 
-func (u userRepo) Register(user model.User) int64 {
-	result := u.db.Create(&user)
+func (userRepo) Register(user model.User) int64 {
+	result := db.Create(&user)
 	if result.RowsAffected > 0 {
 		log.Printf("Register complete\nAffected row : %v", result.RowsAffected)
 	} else {
@@ -64,8 +64,8 @@ func (u userRepo) Register(user model.User) int64 {
 	return result.RowsAffected
 }
 
-func (u userRepo) UpdateUser(user model.User, id int) int64 {
-	result := u.db.Model(&model.User{}).Where("uid = ?", id).Updates(&user)
+func (userRepo) UpdateUser(user model.User, id int) int64 {
+	result := db.Model(&model.User{}).Where("uid = ?", id).Updates(&user)
 	if result.RowsAffected > 0 {
 		log.Printf("Update User complete\nAffected row : %v", result.RowsAffected)
 	} else {
