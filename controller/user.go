@@ -16,10 +16,12 @@ func NewUserController(router *gin.Engine) {
 	{
 		ping.GET("", getAllUser)
 		ping.GET("/ByEmail", getByEmail)
+		ping.GET("/ByName", getByEmail)
 		ping.GET(":id", getByID)
 		ping.POST("/register", register)
 		ping.POST("/login", login)
 		ping.PUT("/update/:id", UpdateUser)
+
 	}
 }
 
@@ -49,6 +51,18 @@ func getByEmail(ctx *gin.Context) {
 	user := &model.User{}
 	ctx.ShouldBindJSON(&user)
 	user, err := userServ.GetUserByEmail(user.Email)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"error": err,
+		})
+	}
+	ctx.JSON(http.StatusOK, user)
+}
+
+func getByNmaw(ctx *gin.Context) {
+	user := &model.User{}
+	ctx.ShouldBindJSON(&user)
+	user, err := userServ.GetUserByName(user.Name)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"error": err,

@@ -22,6 +22,7 @@ type UserService interface {
 	Login(model.User) *model.User
 	GetUserByID(key int) (*model.User, error)
 	GetUserByEmail(key string) (*model.User, error)
+	GetUserByName(key string) (*model.User, error)
 	Update(model.User, int) int64
 }
 
@@ -49,6 +50,14 @@ func (userServ) GetUserByEmail(email string) (*model.User, error) {
 	return user, nil
 }
 
+func (userServ) GetUserByName(name string) (*model.User, error) {
+	user, err := userRepo.FindByName(name)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (userServ) Login(user model.User) *model.User {
 	usr, _ := userRepo.FindByEmail(user.Email)
 	if usr != nil {
@@ -68,18 +77,23 @@ func (userServ) Login(user model.User) *model.User {
 func (userServ) Register(user model.User) int64 {
 	usr, _ := userRepo.FindByEmail(user.Email)
 	if usr.Uid == 0 {
-		pwdHash := hashPassword(user.Password)
-		user.Password = pwdHash
-		rowsAff := userRepo.Register(user)
-		if rowsAff > 0 {
-			return 1
-		} else if rowsAff == 0 {
-			return 0
+		usrName, _ := userRepo.FindByName(user.Name)
+		if usrName.Uid == 0 {
+			pwdHash := hashPassword(user.Password)
+			user.Password = pwdHash
+			rowsAff := userRepo.Register(user)
+			if rowsAff > 0 {
+				return 1
+			} else if rowsAff == 0 {
+				return 0
+			} else {
+				return -1
+			}
 		} else {
-			return -1
+			return 3
 		}
 	} else {
-		return 0
+		return 2
 	}
 }
 
