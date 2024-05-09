@@ -24,6 +24,7 @@ type userRepository interface {
 	Register(model.User) int64
 	FindByID(key int) (*model.User, error)
 	FindByEmail(key string) (*model.User, error)
+	FindByName(key string) (*model.User, error)
 	UpdateUser(model.User, int) int64
 }
 
@@ -48,6 +49,15 @@ func (userRepo) FindByID(id int) (*model.User, error) {
 func (userRepo) FindByEmail(email string) (*model.User, error) {
 	user := model.User{}
 	result := db.Where("email = ?", email).Find(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
+}
+
+func (userRepo) FindByName(name string) (*model.User, error) {
+	user := model.User{}
+	result := db.Where("name= ?", name).Find(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}
