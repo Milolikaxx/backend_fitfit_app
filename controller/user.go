@@ -21,7 +21,7 @@ func NewUserController(router *gin.Engine) {
 		ping.POST("/register", register)
 		ping.POST("/login", login)
 		ping.PUT("/update/:id", UpdateUser)
-		ping.PUT("/updatepassword/:id", UpdateUserPassword)
+		ping.POST("/updatepassword/:id", UpdateUserPassword)
 	}
 }
 

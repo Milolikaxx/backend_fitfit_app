@@ -110,16 +110,32 @@ func (userServ) Update(user model.User, id int) int64 {
 }
 
 func (userServ) UpdateUserPassword(user model.User, id int) int64 {
-	pwdHash := hashPassword(user.Password)
-	user.Password = pwdHash
-	rowsAff := userRepo.UpdateUser(user, id)
-	if rowsAff > 0 {
-		return 1
-	} else if rowsAff == 0 {
-		return 0
+	// เช็ครหัสผ่าน
+	usr, _ := userRepo.FindByID(id)
+	if usr.Uid != 0 {
+		if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(user.Password)) == nil {
+			log.Println("รหัสผ่าน [ ตรง ]")
+			return 1
+		} else {
+			log.Println("รหัสผ่าน [ ไม่ตรง ]")
+			return 2
+		}
 	} else {
-		return -1
+		log.Println("ไม่มี!!!")
+		return 3
 	}
+
+	// บันทึกรหัสผ่าน
+	// pwdHash := hashPassword(user.Password)
+	// user.Password = pwdHash
+	// rowsAff := userRepo.UpdateUser(user, id)
+	// if rowsAff > 0 {
+	// 	return 1
+	// } else if rowsAff == 0 {
+	// 	return 0
+	// } else {
+	// 	return -1
+	// }
 }
 
 func hashPassword(pwd string) string {
