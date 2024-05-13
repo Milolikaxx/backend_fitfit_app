@@ -24,6 +24,7 @@ type UserService interface {
 	GetUserByEmail(key string) (*model.User, error)
 	GetUserByName(key string) (*model.User, error)
 	Update(model.User, int) int64
+	UpdateUserPassword(model.User, int) int64
 }
 
 func (userServ) GetAllUsers() ([]model.User, error) {
@@ -97,14 +98,6 @@ func (userServ) Register(user model.User) int64 {
 	}
 }
 
-func hashPassword(pwd string) string {
-	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
-	if err != nil {
-		log.Println(err)
-	}
-	return string(hash)
-}
-
 func (userServ) Update(user model.User, id int) int64 {
 	rowsAff := userRepo.UpdateUser(user, id)
 	if rowsAff > 0 {
@@ -114,4 +107,25 @@ func (userServ) Update(user model.User, id int) int64 {
 	} else {
 		return -1
 	}
+}
+
+func (userServ) UpdateUserPassword(user model.User, id int) int64 {
+	pwdHash := hashPassword(user.Password)
+	user.Password = pwdHash
+	rowsAff := userRepo.UpdateUser(user, id)
+	if rowsAff > 0 {
+		return 1
+	} else if rowsAff == 0 {
+		return 0
+	} else {
+		return -1
+	}
+}
+
+func hashPassword(pwd string) string {
+	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+	if err != nil {
+		log.Println(err)
+	}
+	return string(hash)
 }

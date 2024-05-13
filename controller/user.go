@@ -21,7 +21,7 @@ func NewUserController(router *gin.Engine) {
 		ping.POST("/register", register)
 		ping.POST("/login", login)
 		ping.PUT("/update/:id", UpdateUser)
-
+		ping.PUT("/updatepassword/:id", UpdateUserPassword)
 	}
 }
 
@@ -90,5 +90,13 @@ func UpdateUser(ctx *gin.Context) {
 	user := model.User{}
 	ctx.ShouldBindJSON(&user)
 	err := userServ.Update(user, id)
+	ctx.JSON(http.StatusOK, err)
+}
+
+func UpdateUserPassword(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	user := model.User{}
+	ctx.ShouldBindJSON(&user)
+	err := userServ.UpdateUserPassword(user, id)
 	ctx.JSON(http.StatusOK, err)
 }
