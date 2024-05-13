@@ -21,7 +21,8 @@ func NewWpRepository() wpRepository {
 
 type wpRepository interface {
 	FindAll() ([]model.WorkoutProfile, error)
-	FindByID(key int) (*model.WorkoutProfile, error)
+	FindByWPID(key int) (*model.WorkoutProfile, error)
+	FindByUID(key int) ([]model.WorkoutProfile, error)
 	AddWorkProfile(model.WorkoutProfile) int64
 	UpdateWorkProfile(wp model.WorkoutProfile, id int) int64
 }
@@ -35,7 +36,7 @@ func (u wpRepo) FindAll() ([]model.WorkoutProfile, error) {
 	return wps, nil
 }
 
-func (wpRepo) FindByID(id int) (*model.WorkoutProfile, error) {
+func (wpRepo) FindByWPID(id int) (*model.WorkoutProfile, error) {
 	wp := model.WorkoutProfile{}
 	result := db.Where("wpid = ?", id).Find(&wp)
 	if result.Error != nil {
@@ -44,14 +45,24 @@ func (wpRepo) FindByID(id int) (*model.WorkoutProfile, error) {
 	return &wp, nil
 }
 
+func (wpRepo) FindByUID(uid int) ([]model.WorkoutProfile, error) {
+	wps := []model.WorkoutProfile{}
+	result := db.Where("uid = ?", uid).Find(&wps)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return wps, nil
+}
+
 func (wpRepo) AddWorkProfile(wp model.WorkoutProfile) int64 {
 	result := db.Create(&wp)
 	if result.RowsAffected > 0 {
 		log.Printf("Add workoutProfile complete\nAffected row : %v", result.RowsAffected)
+		return int64(wp.Wpid)
 	} else {
 		log.Printf("Add workoutProfile failed %v", result.RowsAffected)
+		return 0
 	}
-	return result.RowsAffected
 }
 
 func (wpRepo) UpdateWorkProfile(wp model.WorkoutProfile, id int) int64 {

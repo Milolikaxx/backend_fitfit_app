@@ -15,7 +15,8 @@ func NewWpController(router *gin.Engine) {
 	ping := router.Group("/workprofile")
 	{
 		ping.GET("", getAllWp)
-		ping.GET(":id", getWpByID)
+		ping.GET(":id", getWpByWPID)
+		ping.GET("/user/:id", getWpByUID)
 		ping.POST("/save", Save)
 		ping.PUT("/update/:id", UpdateWorkProfile)
 	}
@@ -31,9 +32,9 @@ func getAllWp(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, wps)
 }
 
-func getWpByID(ctx *gin.Context) {
+func getWpByWPID(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	user, err := wpServ.GetWpByID(id)
+	user, err := wpServ.GetWpByWPID(id)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"error": err,
@@ -42,6 +43,16 @@ func getWpByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
+func getWpByUID(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	user, err := wpServ.GetWpByUID(id)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"error": err,
+		})
+	}
+	ctx.JSON(http.StatusOK, user)
+}
 func Save(ctx *gin.Context) {
 	wp := model.WorkoutProfile{}
 	ctx.ShouldBindJSON(&wp)
