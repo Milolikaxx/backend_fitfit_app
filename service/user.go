@@ -24,7 +24,7 @@ type UserService interface {
 	GetUserByEmail(key string) (*model.User, error)
 	GetUserByName(key string) (*model.User, error)
 	Update(model.User, int) int64
-	UpdateUserPassword(model.User, int) int64
+	UpdateUserPassword(model.RePassword, int) int64
 }
 
 func (userServ) GetAllUsers() ([]model.User, error) {
@@ -109,13 +109,22 @@ func (userServ) Update(user model.User, id int) int64 {
 	}
 }
 
-func (userServ) UpdateUserPassword(user model.User, id int) int64 {
+func (userServ) UpdateUserPassword(rePwd model.RePassword, id int) int64 {
 	// เช็ครหัสผ่าน
 	usr, _ := userRepo.FindByID(id)
 	if usr.Uid != 0 {
-		if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(user.Password)) == nil {
+		if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(rePwd.Password)) == nil {
 			log.Println("รหัสผ่าน [ ตรง ]")
-			return 1
+			pwdHash := hashPassword(rePwd.PasswordNew)
+			usr.Password = pwdHash
+			rowsAff := userRepo.UpdateUser(*usr, id)
+			if rowsAff > 0 {
+				return 1
+			} else if rowsAff == 0 {
+				return 0
+			} else {
+				return -1
+			}
 		} else {
 			log.Println("รหัสผ่าน [ ไม่ตรง ]")
 			return 2

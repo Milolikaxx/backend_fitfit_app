@@ -26,7 +26,6 @@ func (wpmtServ) GetByWPID(id int) ([]model.WorkoutMusictype, error) {
 	}
 	return wpmt, nil
 }
-
 func (wpmtServ) Save(wpmt model.WorkoutMusictype) int64 {
 	rowsAff := wpmtRepo.AddWpMusicType(wpmt)
 	if rowsAff > 0 {

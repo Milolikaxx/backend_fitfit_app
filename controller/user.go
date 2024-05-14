@@ -95,8 +95,8 @@ func UpdateUser(ctx *gin.Context) {
 
 func UpdateUserPassword(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	user := model.User{}
-	ctx.ShouldBindJSON(&user)
-	err := userServ.UpdateUserPassword(user, id)
+	rePwd := model.RePassword{}
+	ctx.ShouldBindJSON(&rePwd)
+	err := userServ.UpdateUserPassword(rePwd, id)
 	ctx.JSON(http.StatusOK, err)
 }
