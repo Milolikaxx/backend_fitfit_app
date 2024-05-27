@@ -19,6 +19,7 @@ func NewWpController(router *gin.Engine) {
 		ping.GET("/user/:id", getWpByUID)
 		ping.POST("/save", Save)
 		ping.PUT("/update/:id", UpdateWorkProfile)
+		ping.GET("/list/:id", getListWpByWPID)
 	}
 }
 
@@ -42,7 +43,16 @@ func getWpByWPID(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, user)
 }
-
+func getListWpByWPID(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	user, err := wpServ.GetListWpByWPID(id)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"error": err,
+		})
+	}
+	ctx.JSON(http.StatusOK, user)
+}
 func getWpByUID(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	user, err := wpServ.GetWpByUID(id)

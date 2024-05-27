@@ -5,13 +5,13 @@ import (
 )
 
 type WorkoutProfile struct {
-	Wpid          int       `gorm:"column:wpid;primary_key;AUTO_INCREMENT"`
-	Uid           int       `gorm:"column:uid;NOT NULL"`
-	LevelExercise int       `gorm:"column:level_exercise;NOT NULL"`
-	Duration      int       `gorm:"column:duration;NOT NULL"`
+	Wpid          int          `gorm:"column:wpid;primary_key;AUTO_INCREMENT"`
+	Uid           int          `gorm:"column:uid;NOT NULL"`
+	LevelExercise int          `gorm:"column:level_exercise;NOT NULL"`
+	Duration      int          `gorm:"column:duration;NOT NULL"`
 	ExerciseType  ExerciseType `gorm:"column:exercise_type;NOT NULL"`
-	CreatedAt     time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP;NOT NULL"`
-	UpdatedAt     time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP"`
+	CreatedAt     time.Time    `gorm:"column:created_at;default:CURRENT_TIMESTAMP;NOT NULL"`
+	UpdatedAt     time.Time    `gorm:"column:updated_at;default:CURRENT_TIMESTAMP"`
 }
 
 func (m *WorkoutProfile) TableName() string {
@@ -21,9 +21,9 @@ func (m *WorkoutProfile) TableName() string {
 type ExerciseType string
 
 const (
-	Walk ExerciseType = "การเดิน"
-	Jogging ExerciseType = "การวิ่งแบบเหยาะๆ"
-	Run ExerciseType = "การวิ่งปกติ"
+	Walk      ExerciseType = "การเดิน"
+	Jogging   ExerciseType = "การวิ่งแบบเหยาะๆ"
+	Run       ExerciseType = "การวิ่งปกติ"
 	Treadmill ExerciseType = "การวิ่งบนลู่"
 	RideAbike ExerciseType = "ปั่นจักรยาน"
 )

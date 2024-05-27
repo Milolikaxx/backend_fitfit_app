@@ -16,6 +16,7 @@ var wpRepo = repository.NewWpRepository()
 type WpService interface {
 	GetAllWps() ([]model.WorkoutProfile, error)
 	GetWpByWPID(key int) (*model.WorkoutProfile, error)
+	GetListWpByWPID(key int) ([]model.WorkoutProfile, error)
 	GetWpByUID(key int) ([]model.WorkoutProfile, error)
 	Save(model.WorkoutProfile) int64
 	Update(wp model.WorkoutProfile, id int) int64
@@ -36,7 +37,13 @@ func (wpServ) GetWpByWPID(id int) (*model.WorkoutProfile, error) {
 	}
 	return wp, nil
 }
-
+func (wpServ) GetListWpByWPID(id int) ([]model.WorkoutProfile, error) {
+	wps, err := wpRepo.FindListByWPID(id)
+	if err != nil {
+		return nil, err
+	}
+	return wps, nil
+}
 func (wpServ) GetWpByUID(id int) ([]model.WorkoutProfile, error) {
 	wps, err := wpRepo.FindByUID(id)
 	if err != nil {

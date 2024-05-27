@@ -22,6 +22,7 @@ func NewWpRepository() wpRepository {
 type wpRepository interface {
 	FindAll() ([]model.WorkoutProfile, error)
 	FindByWPID(key int) (*model.WorkoutProfile, error)
+	FindListByWPID(key int) ([]model.WorkoutProfile, error)
 	FindByUID(key int) ([]model.WorkoutProfile, error)
 	AddWorkProfile(model.WorkoutProfile) int64
 	UpdateWorkProfile(wp model.WorkoutProfile, id int) int64
@@ -43,6 +44,14 @@ func (wpRepo) FindByWPID(id int) (*model.WorkoutProfile, error) {
 		return nil, result.Error
 	}
 	return &wp, nil
+}
+func (wpRepo) FindListByWPID(id int) ([]model.WorkoutProfile, error) {
+	wps := []model.WorkoutProfile{}
+	result := db.Joins("WorkoutMusictype").Where("Wpid = ?", id).Find(&wps)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return wps, nil
 }
 
 func (wpRepo) FindByUID(uid int) ([]model.WorkoutProfile, error) {
