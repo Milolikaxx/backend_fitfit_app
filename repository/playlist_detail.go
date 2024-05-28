@@ -21,6 +21,7 @@ func NewPlaylistDetailRepository() playlistDetailRepository {
 
 type playlistDetailRepository interface {
 	FindAll() ([]model.PlaylistDetail, error)
+	FindListByPID(key int) ([]model.PlaylistDetail, error)
 	// FindByID(key int) (*model.PlaylistDetail, error)
 	// AddPlaylist(model.PlaylistDetail) int64
 	// UpdatePlaylist(model.PlaylistDetail, int) int64
@@ -29,6 +30,15 @@ type playlistDetailRepository interface {
 func (playlistDetailRepo) FindAll() ([]model.PlaylistDetail, error) {
 	playlistDetail := []model.PlaylistDetail{}
 	result := db.Find(&playlistDetail)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return playlistDetail, nil
+}
+
+func (playlistDetailRepo) FindListByPID(id int) ([]model.PlaylistDetail, error) {
+	playlistDetail := []model.PlaylistDetail{}
+	result := db.Joins("playlist").Where("playlist_detail.pid = ?", id).Find(&playlistDetail)
 	if result.Error != nil {
 		return nil, result.Error
 	}
