@@ -27,7 +27,7 @@ type wpMusicTypeRepository interface {
 
 func (wpmusicTypeRepo) FindByWPID(id int) ([]model.WorkoutMusictype, error) {
 	wpMusicType := []model.WorkoutMusictype{}
-	result := db.Joins("MusicType").Where("wpid = ?", id).Find(&wpMusicType)
+	result := db.Where("wpid = ?", id).Find(&wpMusicType)
 	if result.Error != nil {
 		return nil, result.Error
 	}

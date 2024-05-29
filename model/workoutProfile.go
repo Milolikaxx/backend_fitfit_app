@@ -5,13 +5,14 @@ import (
 )
 
 type WorkoutProfile struct {
-	Wpid          int          `gorm:"column:wpid;primary_key;AUTO_INCREMENT"`
-	Uid           int          `gorm:"column:uid;NOT NULL"`
-	LevelExercise int          `gorm:"column:level_exercise;NOT NULL"`
-	Duration      int          `gorm:"column:duration;NOT NULL"`
-	ExerciseType  ExerciseType `gorm:"column:exercise_type;NOT NULL"`
-	CreatedAt     time.Time    `gorm:"column:created_at;default:CURRENT_TIMESTAMP;NOT NULL"`
-	UpdatedAt     time.Time    `gorm:"column:updated_at;default:CURRENT_TIMESTAMP"`
+	Wpid             int              `gorm:"column:wpid;primary_key;AUTO_INCREMENT"`
+	Uid              int              `gorm:"column:uid;NOT NULL"`
+	LevelExercise    int              `gorm:"column:level_exercise;NOT NULL"`
+	Duration         int              `gorm:"column:duration;NOT NULL"`
+	ExerciseType     ExerciseType     `gorm:"column:exercise_type;NOT NULL"`
+	CreatedAt        time.Time        `gorm:"column:created_at;default:CURRENT_TIMESTAMP;NOT NULL"`
+	UpdatedAt        time.Time        `gorm:"column:updated_at;default:CURRENT_TIMESTAMP"`
+	WorkoutMusictype WorkoutMusictype `gorm:"foreignKey:Wpid"`
 }
 
 func (m *WorkoutProfile) TableName() string {
