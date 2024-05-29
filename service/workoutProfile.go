@@ -37,6 +37,7 @@ func (wpServ) GetWpByWPID(id int) (*model.WorkoutProfile, error) {
 	}
 	return wp, nil
 }
+
 func (wpServ) GetListWpByWPID(id int) ([]model.WorkoutProfile, error) {
 	wps, err := wpRepo.FindListByWPID(id)
 	if err != nil {
@@ -44,6 +45,7 @@ func (wpServ) GetListWpByWPID(id int) ([]model.WorkoutProfile, error) {
 	}
 	return wps, nil
 }
+
 func (wpServ) GetWpByUID(id int) ([]model.WorkoutProfile, error) {
 	wps, err := wpRepo.FindByUID(id)
 	if err != nil {
