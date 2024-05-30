@@ -21,7 +21,7 @@ func NewPlaylistRepository() playlistRepository {
 
 type playlistRepository interface {
 	FindAll() ([]model.Playlist, error)
-	FindByID(key int) (*model.Playlist, error)
+	FindByID(key int) ([]model.Playlist, error)
 	AddPlaylist(model.Playlist) int64
 	UpdatePlaylist(model.Playlist, int) int64
 }
@@ -35,18 +35,29 @@ func (playlistRepo) FindAll() ([]model.Playlist, error) {
 	return playlist, nil
 }
 
-func (playlistRepo) FindByID(id int) (*model.Playlist, error) {
-	playlist := model.Playlist{}
-	result := db.Where("pid = ?", id).Preload("Musics").Find(&playlist)
+func (playlistRepo) FindByID(id int) ([]model.Playlist, error) {
+	playlist := []model.Playlist{}
+	result := db.Preload("PlaylistDetail.Music.MusicType").Where("pid = ?", id).Find(&playlist)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return &playlist, nil
+	return playlist, nil
 }
 
+// Join
+// func (playlistRepo) FindByID(id int) ([]model.Playlist, error) {
+// 	playlist := []model.Playlist{}
+// 	result := db.Joins("PlaylistDetail").Joins("PlaylistDetail.Music").Where("playlist.pid = ?", id).Find(&playlist)
+// 	if result.Error != nil {
+// 		return nil, result.Error
+// 	}
+// 	return playlist, nil
+// }
+
+// Preload
 // func (playlistRepo) FindByID(id int) (*model.Playlist, error) {
 // 	playlist := model.Playlist{}
-// 	result := db.Where("pid = ?", id).Preload("Musics.name").Find(&playlist)
+// 	result := db.Where("pid = ?", id).Preload("Musics").Find(&playlist)
 // 	if result.Error != nil {
 // 		return nil, result.Error
 // 	}
