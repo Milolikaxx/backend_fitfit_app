@@ -12,6 +12,7 @@ type Playlist struct {
 	ImagePlaylist    string    `gorm:"column:image_playlist;NOT NULL"`
 	CreatedAt        time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP;NOT NULL"`
 	UpdatedAt        time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP;NOT NULL"`
+	Musics           []Music   `gorm:"many2many:playlist_detail;foreignKey:Pid;joinForeignKey:Pid;References:Mid;joinReferences:Mid"`
 }
 
 func (m *Playlist) TableName() string {

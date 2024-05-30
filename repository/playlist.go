@@ -37,12 +37,21 @@ func (playlistRepo) FindAll() ([]model.Playlist, error) {
 
 func (playlistRepo) FindByID(id int) (*model.Playlist, error) {
 	playlist := model.Playlist{}
-	result := db.Where("pid = ?", id).Find(&playlist)
+	result := db.Where("pid = ?", id).Preload("Musics").Find(&playlist)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return &playlist, nil
 }
+
+// func (playlistRepo) FindByID(id int) (*model.Playlist, error) {
+// 	playlist := model.Playlist{}
+// 	result := db.Where("pid = ?", id).Preload("Musics.name").Find(&playlist)
+// 	if result.Error != nil {
+// 		return nil, result.Error
+// 	}
+// 	return &playlist, nil
+// }
 
 func (playlistRepo) AddPlaylist(playlist model.Playlist) int64 {
 	result := db.Create(&playlist)
