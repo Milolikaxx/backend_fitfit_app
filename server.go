@@ -15,6 +15,6 @@ func StartServer() {
 	controller.NewWpMusicTypeController(router)
 	controller.NewPostController(router)
 	controller.NewPlaylistDetailController(router)
-	// controller.NewMusicController(router)
+	controller.NewMusicController(router)
 	router.Run()
 }
