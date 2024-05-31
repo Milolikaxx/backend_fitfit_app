@@ -18,12 +18,13 @@ func NewMusicController(router *gin.Engine) {
 }
 
 func getMusicByWtid(ctx *gin.Context) {
+
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	user, err := musicServ.GetMusicByMtid(id)
+	music, err := musicServ.GetMusicByMtid(id)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"error": err,
 		})
 	}
-	ctx.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, music)
 }

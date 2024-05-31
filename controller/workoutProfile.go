@@ -19,7 +19,7 @@ func NewWpController(router *gin.Engine) {
 		// ping.GET("/user/:id", getWpByUID)
 		ping.POST("/save", Save)
 		ping.PUT("/update/:id", UpdateWorkProfile)
-		ping.GET("/list/:id", getListWpByUid)
+		ping.GET("/user/:id", getListWpByUid)
 	}
 }
 
