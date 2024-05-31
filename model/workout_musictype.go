@@ -5,7 +5,7 @@ type WorkoutMusictype struct {
 	Wpid int `gorm:"column:wpid;NOT NULL"`
 	// WorkoutProfile WorkoutProfile `gorm:"foreignKey:Wpid"`
 	Mtid      int       `gorm:"column:mtid;NOT NULL"`
-	MusicType MusicType `gorm:"foreignKey:Mtid"`
+	MusicType MusicType `gorm:"foreignKey:Mtid;references:Mtid"`
 }
 
 func (m *WorkoutMusictype) TableName() string {
