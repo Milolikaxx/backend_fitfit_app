@@ -54,7 +54,7 @@ func (playlistRepo) FindByID(id int) ([]model.Playlist, error) {
 // 	return playlist, nil
 // }
 
-// Preload
+// Preload 
 // func (playlistRepo) FindByID(id int) (*model.Playlist, error) {
 // 	playlist := model.Playlist{}
 // 	result := db.Where("pid = ?", id).Preload("Musics").Find(&playlist)

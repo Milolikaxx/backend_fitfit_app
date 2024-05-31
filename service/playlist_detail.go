@@ -17,7 +17,7 @@ type PlaylistDetailService interface {
 	GetAllPlaylistDetail() ([]model.PlaylistDetail, error)
 	GetListWpByPID(key int) ([]model.PlaylistDetail, error)
 	// GetByID(key int) (*model.Playlist, error)
-	// Save(model.Playlist) int64
+	Save(model.PlaylistDetail) int64
 	// Update(playlist model.Playlist, id int) int64
 }
 
@@ -34,4 +34,14 @@ func (playlistDetailServ) GetListWpByPID(id int) ([]model.PlaylistDetail, error)
 		return nil, err
 	}
 	return playlistDetail, nil
+}
+func (playlistDetailServ) Save(PlaylistDetail model.PlaylistDetail) int64 {
+	pldid := playlistDetailRepo.AddMusicToPlaylist(PlaylistDetail)
+	if pldid > 0 {
+		return pldid
+	} else if pldid == 0 {
+		return 0
+	} else {
+		return -1
+	}
 }

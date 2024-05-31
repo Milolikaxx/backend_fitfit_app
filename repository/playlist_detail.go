@@ -2,7 +2,7 @@ package repository
 
 import (
 	"backend_fitfit_app/model"
-	// "log"
+	"log"
 
 	"gorm.io/gorm"
 )
@@ -22,9 +22,7 @@ func NewPlaylistDetailRepository() playlistDetailRepository {
 type playlistDetailRepository interface {
 	FindAll() ([]model.PlaylistDetail, error)
 	FindListByPID(key int) ([]model.PlaylistDetail, error)
-	// FindByID(key int) (*model.PlaylistDetail, error)
-	// AddPlaylist(model.PlaylistDetail) int64
-	// UpdatePlaylist(model.PlaylistDetail, int) int64
+	AddMusicToPlaylist(model.PlaylistDetail) int64
 }
 
 func (playlistDetailRepo) FindAll() ([]model.PlaylistDetail, error) {
@@ -43,4 +41,15 @@ func (playlistDetailRepo) FindListByPID(id int) ([]model.PlaylistDetail, error) 
 		return nil, result.Error
 	}
 	return playlistDetail, nil
+}
+
+func (playlistDetailRepo) AddMusicToPlaylist(playlistDetail model.PlaylistDetail) int64 {
+	result := db.Create(&playlistDetail)
+	if result.RowsAffected > 0 {
+		log.Printf("Add Music complete\nAffected row : %v", result.RowsAffected)
+		return int64(playlistDetail.ID)
+	} else {
+		log.Printf("Add Music failed %v", result.RowsAffected)
+		return 0
+	}
 }
