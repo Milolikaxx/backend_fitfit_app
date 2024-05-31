@@ -16,10 +16,10 @@ func NewWpController(router *gin.Engine) {
 	{
 		ping.GET("", getAllWp)
 		ping.GET(":id", getWpByWPID)
-		ping.GET("/user/:id", getWpByUID)
+		// ping.GET("/user/:id", getWpByUID)
 		ping.POST("/save", Save)
 		ping.PUT("/update/:id", UpdateWorkProfile)
-		ping.GET("/list/:id", getListWpByWPID)
+		ping.GET("/list/:id", getListWpByUid)
 	}
 }
 
@@ -35,7 +35,7 @@ func getAllWp(ctx *gin.Context) {
 
 func getWpByWPID(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	user, err := wpServ.GetWpByWPID(id)
+	user, err := wpServ.GetWpByWpid(id)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"error": err,
@@ -43,9 +43,9 @@ func getWpByWPID(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, user)
 }
-func getListWpByWPID(ctx *gin.Context) {
+func getListWpByUid(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	user, err := wpServ.GetListWpByWPID(id)
+	user, err := wpServ.GetListWpByUid(id)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"error": err,
@@ -53,16 +53,17 @@ func getListWpByWPID(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, user)
 }
-func getWpByUID(ctx *gin.Context) {
-	id, _ := strconv.Atoi(ctx.Param("id"))
-	user, err := wpServ.GetWpByUID(id)
-	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"error": err,
-		})
-	}
-	ctx.JSON(http.StatusOK, user)
-}
+
+//	func getWpByUID(ctx *gin.Context) {
+//		id, _ := strconv.Atoi(ctx.Param("id"))
+//		user, err := wpServ.GetWpByUID(id)
+//		if err != nil {
+//			ctx.JSON(http.StatusOK, gin.H{
+//				"error": err,
+//			})
+//		}
+//		ctx.JSON(http.StatusOK, user)
+//	}
 func Save(ctx *gin.Context) {
 	wp := model.WorkoutProfile{}
 	ctx.ShouldBindJSON(&wp)
