@@ -20,6 +20,7 @@ func NewMusicRepository() musicRepository {
 
 type musicRepository interface {
 	FindAllMusicByMusictype(key int) ([]model.Music, error)
+	RandomMusicByMusictype(id int) (*model.Music, error)
 }
 
 func (musicRepo) FindAllMusicByMusictype(id int) ([]model.Music, error) {
@@ -29,4 +30,13 @@ func (musicRepo) FindAllMusicByMusictype(id int) ([]model.Music, error) {
 		return nil, result.Error
 	}
 	return music, nil
+}
+
+func (musicRepo) RandomMusicByMusictype(id int) (*model.Music, error) {
+	music := model.Music{}
+	result := db.Joins("MusicType").Where("music.mtid = ?", id).Order("RAND()").First(&music)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &music, nil
 }
