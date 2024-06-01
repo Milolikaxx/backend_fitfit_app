@@ -16,9 +16,8 @@ var playlistDetailRepo = repository.NewPlaylistDetailRepository()
 type PlaylistDetailService interface {
 	GetAllPlaylistDetail() ([]model.PlaylistDetail, error)
 	GetListWpByPID(key int) ([]model.PlaylistDetail, error)
-	// GetByID(key int) (*model.Playlist, error)
 	Save(model.PlaylistDetail) int64
-	// Update(playlist model.Playlist, id int) int64
+	Delete(key int) (int64, error)
 }
 
 func (playlistDetailServ) GetAllPlaylistDetail() ([]model.PlaylistDetail, error) {
@@ -43,5 +42,15 @@ func (playlistDetailServ) Save(PlaylistDetail model.PlaylistDetail) int64 {
 		return 0
 	} else {
 		return -1
+	}
+}
+func (playlistDetailServ) Delete(id int) (int64, error) {
+	row, error := playlistDetailRepo.DeleteMusicInPlaylist(id)
+	if row > 0 {
+		return 1, error
+	} else if row == 0 {
+		return 0, error
+	} else {
+		return -1, error
 	}
 }
