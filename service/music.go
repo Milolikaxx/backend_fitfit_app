@@ -18,8 +18,8 @@ type MusicService interface {
 	GetRandomMusicByMtid(id int) (*model.Music, error)
 }
 
-func (musicServ) GetMusicByMtid(id int) ([]model.Music, error) {
-	music, err := musicRepo.FindAllMusicByMusictype(id)
+func (musicServ) GetMusicByMtid(musicType int) ([]model.Music, error) {
+	music, err := musicRepo.FindAllMusicByMusictype(musicType)
 	if err != nil {
 		return nil, err
 	}

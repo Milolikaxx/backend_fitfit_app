@@ -59,18 +59,6 @@ func getByEmail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
-func getByNmaw(ctx *gin.Context) {
-	user := &model.User{}
-	ctx.ShouldBindJSON(&user)
-	user, err := userServ.GetUserByName(user.Name)
-	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"error": err,
-		})
-	}
-	ctx.JSON(http.StatusOK, user)
-}
-
 func login(ctx *gin.Context) {
 	user := model.User{}
 	ctx.ShouldBindJSON(&user)

@@ -47,7 +47,7 @@ func (wpRepo) FindByWpid(id int) (*model.WorkoutProfile, error) {
 }
 func (wpRepo) FindListByUid(id int) ([]model.WorkoutProfile, error) {
 	wps := []model.WorkoutProfile{}
-	// result := db.Joins("WorkoutMusictype").Joins("WorkoutMusictype.MusicType").Where("workout_profile.wpid = ?", id).Find(&wps)
+	// result := db.Joins("WorkoutMusictype").Joins("WorkoutMusictype.MusicType").Where("workout_profile.uid = ?", id).Find(&wps)
 	result := db.Preload("WorkoutMusictype.MusicType").Where("workout_profile.uid = ?", id).Find(&wps)
 	if result.Error != nil {
 		return nil, result.Error
