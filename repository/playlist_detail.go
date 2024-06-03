@@ -21,23 +21,13 @@ func NewPlaylistDetailRepository() playlistDetailRepository {
 
 type playlistDetailRepository interface {
 	FindAll() ([]model.PlaylistDetail, error)
-	FindListByPID(key int) ([]model.PlaylistDetail, error)
 	AddMusicToPlaylist(model.PlaylistDetail) int64
 	DeleteMusicInPlaylist(key int) (int, error)
 }
 
 func (playlistDetailRepo) FindAll() ([]model.PlaylistDetail, error) {
 	playlistDetail := []model.PlaylistDetail{}
-	result := db.Find(&playlistDetail)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return playlistDetail, nil
-}
-
-func (playlistDetailRepo) FindListByPID(id int) ([]model.PlaylistDetail, error) {
-	playlistDetail := []model.PlaylistDetail{}
-	result := db.Joins("playlist").Where("playlist_detail.pid = ?", id).Find(&playlistDetail)
+	result := db.Joins("Music").Find(&playlistDetail)
 	if result.Error != nil {
 		return nil, result.Error
 	}
