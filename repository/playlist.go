@@ -54,7 +54,7 @@ func (playlistRepo) FindByID(id int) ([]model.Playlist, error) {
 // 	return playlist, nil
 // }
 
-// Preload 
+// Preload
 // func (playlistRepo) FindByID(id int) (*model.Playlist, error) {
 // 	playlist := model.Playlist{}
 // 	result := db.Where("pid = ?", id).Preload("Musics").Find(&playlist)
@@ -68,10 +68,12 @@ func (playlistRepo) AddPlaylist(playlist model.Playlist) int64 {
 	result := db.Create(&playlist)
 	if result.RowsAffected > 0 {
 		log.Printf("Add workoutProfile complete\nAffected row : %v", result.RowsAffected)
+		return int64(playlist.Pid)
 	} else {
 		log.Printf("Add workoutProfile failed %v", result.RowsAffected)
+		return 0
 	}
-	return result.RowsAffected
+
 }
 
 func (playlistRepo) UpdatePlaylist(playlist model.Playlist, id int) int64 {
