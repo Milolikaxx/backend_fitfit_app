@@ -38,11 +38,11 @@ func (playlistDetailRepo) AddMusicToPlaylist(playlistDetail model.PlaylistDetail
 	result := db.Create(&playlistDetail)
 	if result.RowsAffected > 0 {
 		log.Printf("Add Music complete\nAffected row : %v", result.RowsAffected)
-		return int64(playlistDetail.ID)
 	} else {
 		log.Printf("Add Music failed %v", result.RowsAffected)
-		return 0
+
 	}
+	return result.RowsAffected
 }
 
 func (playlistDetailRepo) DeleteMusicInPlaylist(id int) (int, error) {
