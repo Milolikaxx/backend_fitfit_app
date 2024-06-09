@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"reflect"
+	"slices"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -57,19 +58,23 @@ func DeleteMusic(ctx *gin.Context) {
 func getMusicList(ctx *gin.Context) {
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	music := CreatePlaylistWP(id)
+	music, err := CreatePlaylistWP(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	ctx.JSON(http.StatusOK, music)
 
 }
 
 var bpm = []int{100, 114, 133, 152, 171, 190}
 var levelProceed = [][]int{
-	{100},                   //Lv.0
-	{10, 35},                //Lv.1
-	{5, 10, 30},             //Lv.2
-	{5, 10, 15, 30},         //Lv.3
-	{5, 10, 10, 15, 30},     //Lv.4
-	{5, 10, 15, 10, 15, 30}, //Lv.5
+	{100},          //Lv.0
+	{10, 35},       //Lv.1
+	{10, 12, 22},   //Lv.2
+	{5, 5, 10, 25}, //Lv.3
+	// {10, 20, 30, 40},        //Lv.4
+	// {5, 10, 15, 10, 15, 30}, //Lv.5
 }
 
 type MusicGroup struct {
@@ -87,7 +92,7 @@ func groupBy(maps []MusicGroup, level int) []model.Music {
 	return groups
 }
 
-func CreatePlaylistWP(wpid int) []model.Music {
+func CreatePlaylistWP(wpid int) ([]model.Music, error) {
 	//workout_profile
 	var wpRepo = repository.NewWpRepository()
 	wp, _ := wpRepo.FindByWpid(wpid)
@@ -100,17 +105,17 @@ func CreatePlaylistWP(wpid int) []model.Music {
 	for _, t := range wp.WorkoutMusictype {
 		musicType = append(musicType, t.Mtid)
 	}
-	fmt.Printf("infomation  lvl:%d  duration:%d  type:%s  musicType:%v  bpm:%d  \n\n", lvl, duration, exeType, musicType, bpm[lvl-1])
+	fmt.Printf("infomation  lvl:%d  duration:%d  type:%s  musicType:%v  bpm:%d  \n\n", lvl, duration, exeType, musicType, bpm[lvl])
 
 	//music - level
 	musicRepo := repository.NewMusicRepository()
-	music, _ := musicRepo.FindAllMusicByLevel(bpm[lvl+1], musicType)
+	music, _ := musicRepo.FindAllMusicByLevel(bpm[lvl], musicType)
 	fmt.Printf("result music:%d\n\n", len(music))
 
 	//grouping
 	fmt.Printf("music type %s\n\n", reflect.TypeOf(music))
 	var groupMusic []MusicGroup
-	for i := 0; i < lvl+1; i++ {
+	for i := 0; i <= lvl; i++ {
 		for _, m := range music {
 			if i == 0 {
 				if m.Bpm <= bpm[i] {
@@ -129,47 +134,60 @@ func CreatePlaylistWP(wpid int) []model.Music {
 			}
 		}
 	}
-	fmt.Printf("level0 = %d\n", len(groupBy(groupMusic, 0)))
-	fmt.Printf("level1 = %d\n", len(groupBy(groupMusic, 1)))
-	fmt.Printf("level2 = %d\n", len(groupBy(groupMusic, 2)))
-	fmt.Printf("level3 = %d\n", len(groupBy(groupMusic, 3)))
-	fmt.Printf("level4 = %d\n", len(groupBy(groupMusic, 4)))
-	fmt.Printf("level5 = %d\n\n", len(groupBy(groupMusic, 5)))
+
+	fmt.Printf("level0 = %d เพลง\n ", len(groupBy(groupMusic, 0)))
+	fmt.Printf("level1 = %d เพลง\n", len(groupBy(groupMusic, 1)))
+	fmt.Printf("level2 = %d เพลง\n", len(groupBy(groupMusic, 2)))
+	fmt.Printf("level3 = %d เพลง\n", len(groupBy(groupMusic, 3)))
+	fmt.Printf("level4 = %d เพลง\n", len(groupBy(groupMusic, 4)))
+	fmt.Printf("level5 = %d เพลง\n\n", len(groupBy(groupMusic, 5)))
 
 	//proceed
-	// fmt.Println(levelProceed[2])
+	fmt.Println(levelProceed[lvl])
 	timeRemain := duration                 //เวลาที่ยังเหลือ
-	timeThisLevel := 0                     //เวลาเปอร์เซ็น ของเลเวลนี้
+	timeMusicThisLevelSec := 0             //เวลาเพลงของเลเวลนี้
 	levelProceed_used := levelProceed[lvl] //ระดับ Cardio ตามเลเวล
-	levelProceed_curr := 0                 //เลเวลที่ตรงกับเวลาตอนนี้
+	levelProceed_curr := 0                 //เลเวลปัจจุบันที่ขยับมา ขนาดออกกำลังกาย
 	var musicList []model.Music
-	usedSongs := make(map[string]bool) // To track used songs
+	var usedSongs = make([]string, 0) // used songs
 	fmt.Println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ")
 	for {
 		if timeRemain <= 0 {
 			break
 		}
-		idx := rand.Int() % len(groupBy(groupMusic, levelProceed_curr))
-		m := groupBy(groupMusic, levelProceed_curr)[idx]
-		if usedSongs[m.Name] {
-			continue
+		fmt.Print()
+		groupedMusic := groupBy(groupMusic, levelProceed_curr)
+		length := len(groupedMusic)
+		if length == 0 {
+			return musicList, fmt.Errorf("ไม่มีเพลงที่สามารถใช้ได้ในระดับปัจจุบัน")
 		}
-		usedSongs[m.Name] = true
+
+		idx := rand.Int() % length
+		m := groupBy(groupMusic, levelProceed_curr)[idx]
+		//Check Dup Song
+		if slices.Contains(usedSongs, m.Name) {
+			fmt.Printf("inList : %s\n", m.Name)
+			continue //เพลงซ้ำ
+		} else {
+			usedSongs = append(usedSongs, m.Name)
+			fmt.Printf("add : %s , time : %f\n ", m.Name, m.Duration)
+		}
 		musicList = append(musicList, m)
-		t := int(int(m.Duration)*60) + int(math.Round((m.Duration-math.Trunc(m.Duration))*100))
-		timeRemain -= t
-		timeThisLevel += t
+		timeMusicSec := int(m.Duration)*60 + int(math.Round((m.Duration-math.Trunc(m.Duration))*60))
+		timeRemain -= timeMusicSec
+		timeMusicThisLevelSec += timeMusicSec
 		percent := levelProceed_used[levelProceed_curr]
-		timeChange := duration * percent / 100
-		fmt.Printf("timeThisLevel:%d  levelProceed_curr:%d  percent%d  timeChange:%d  duration:%d\n", timeThisLevel, levelProceed_curr, percent, timeChange, duration)
-		if timeThisLevel > timeChange {
-			timeThisLevel = 0   //รีเซ็ตเวลาเปอร์เซ็นของเลเวลนี้
-			levelProceed_curr++ //ขยับเลือกเลเวลอื่น
-			if levelProceed_curr >= lvl {
+		timeExPercentSec := duration * percent / 100
+		fmt.Printf("timeRemain : %d timeThisLevel:%d  levelProceed_curr:%d  percent%d  timeExPercentSec:%d  durationEx:%d\n", timeRemain, timeMusicThisLevelSec, levelProceed_curr, percent, timeExPercentSec, duration)
+		if timeMusicThisLevelSec > timeExPercentSec {
+			timeMusicThisLevelSec = 0 //รีเซ็ตเวลาเปอร์เซ็นของเลเวลนี้
+			levelProceed_curr++       //ขยับไปเลเวลอื่น
+			if levelProceed_curr > lvl {
 				levelProceed_curr = 0
 			}
+			fmt.Printf("หลัง +- แล้ว levelProceed_curr:%d \n", levelProceed_curr)
 		}
 	}
 	fmt.Printf("musicList:%d\n\n", len(musicList))
-	return musicList
+	return musicList, nil
 }

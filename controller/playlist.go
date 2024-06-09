@@ -15,6 +15,7 @@ func NewPlaylistController(router *gin.Engine) {
 	ping := router.Group("/playlist")
 	{
 		ping.GET("", getAllPlaylist)
+		ping.GET("/wp/:id", getAllPlaylistByWpid)
 		ping.GET(":id", getPlaylistByID)
 		ping.POST("/save", SavePlaylist)
 		ping.PUT("/update/:id", UpdatePlaylist)
@@ -30,7 +31,16 @@ func getAllPlaylist(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, wps)
 }
-
+func getAllPlaylistByWpid(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	wps, err := playlistServ.GetAllPlaylistByWpid(id)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"error": err,
+		})
+	}
+	ctx.JSON(http.StatusOK, wps)
+}
 func getPlaylistByID(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	user, err := playlistServ.GetByID(id)

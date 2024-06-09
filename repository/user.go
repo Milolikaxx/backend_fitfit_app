@@ -65,7 +65,7 @@ func (userRepo) FindByName(name string) (*model.User, error) {
 }
 
 func (userRepo) Register(user model.User) int64 {
-	result := db.Create(&user)
+	result := db.Omit("google_id").Create(&user)
 	if result.RowsAffected > 0 {
 		log.Printf("Register complete\nAffected row : %v", result.RowsAffected)
 	} else {
