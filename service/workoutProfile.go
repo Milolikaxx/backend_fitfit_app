@@ -19,6 +19,7 @@ type WpService interface {
 	GetListWpByUid(key int) ([]model.WorkoutProfile, error)
 	// GetWpByUID(key int) ([]model.WorkoutProfile, error)
 	Save(model.WorkoutProfile) int64
+	Delete(id int) (int64, error)
 	Update(wp model.WorkoutProfile, id int) int64
 }
 
@@ -62,6 +63,17 @@ func (wpServ) Save(wp model.WorkoutProfile) int64 {
 		return 0
 	} else {
 		return -1
+	}
+}
+
+func (wpServ) Delete(id int) (int64, error) {
+	row, error := wpRepo.DeleteProfile(id)
+	if row > 0 {
+		return 1, error
+	} else if row == 0 {
+		return 0, error
+	} else {
+		return -1, error
 	}
 }
 

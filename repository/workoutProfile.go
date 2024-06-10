@@ -25,6 +25,7 @@ type wpRepository interface {
 	FindListByUid(key int) ([]model.WorkoutProfile, error)
 	// FindByUID(key int) ([]model.WorkoutProfile, error)
 	AddWorkProfile(model.WorkoutProfile) int64
+	DeleteProfile(id int) (int, error)
 	UpdateWorkProfile(wp model.WorkoutProfile, id int) int64
 }
 
@@ -74,6 +75,14 @@ func (wpRepo) AddWorkProfile(wp model.WorkoutProfile) int64 {
 		log.Printf("Add workoutProfile failed %v", result.RowsAffected)
 		return 0
 	}
+}
+
+func (wpRepo) DeleteProfile(id int) (int, error) {
+	result := db.Delete(&model.WorkoutProfile{}, id)
+	if result.Error != nil {
+		return int(result.RowsAffected), result.Error
+	}
+	return int(result.RowsAffected), nil
 }
 
 func (wpRepo) UpdateWorkProfile(wp model.WorkoutProfile, id int) int64 {
