@@ -16,7 +16,7 @@ var playlistRepo = repository.NewPlaylistRepository()
 type PlaylistService interface {
 	GetAllPlaylist() ([]model.Playlist, error)
 	GetAllPlaylistByWpid(id int) ([]model.Playlist, error)
-	GetByID(key int) ([]model.Playlist, error)
+	GetByID(key int) (*model.Playlist, error)
 	Save(model.Playlist) int64
 	Update(playlist model.Playlist, id int) int64
 }
@@ -36,7 +36,7 @@ func (playlistServ) GetAllPlaylistByWpid(id int) ([]model.Playlist, error) {
 	return playlist, nil
 }
 
-func (playlistServ) GetByID(id int) ([]model.Playlist, error) {
+func (playlistServ) GetByID(id int) (*model.Playlist, error) {
 	playlist, err := playlistRepo.FindByID(id)
 	if err != nil {
 		return nil, err
