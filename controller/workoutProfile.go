@@ -19,6 +19,7 @@ func NewWpController(router *gin.Engine) {
 		ping.POST("/save", Save)
 		ping.PUT("/update/:id", UpdateWorkProfile)
 		ping.GET("/user/:id", getListWpByUid)
+		ping.DELETE("/delprofile/:id", getListWpByUid)
 	}
 }
 
@@ -69,6 +70,17 @@ func Save(ctx *gin.Context) {
 	ctx.ShouldBindJSON(&wp)
 	err := wpServ.Save(wp)
 	ctx.JSON(http.StatusCreated, err)
+}
+
+func DeleteWorkProfile(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	wp, err := wpServ.Delete(id)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"error": err,
+		})
+	}
+	ctx.JSON(http.StatusOK, wp)
 }
 
 func UpdateWorkProfile(ctx *gin.Context) {
