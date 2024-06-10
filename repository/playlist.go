@@ -22,7 +22,7 @@ func NewPlaylistRepository() playlistRepository {
 type playlistRepository interface {
 	FindAll() ([]model.Playlist, error)
 	FindAllByWpid(id int) ([]model.Playlist, error)
-	FindByID(key int) ([]model.Playlist, error)
+	FindByID(key int) (*model.Playlist, error)
 
 	AddPlaylist(model.Playlist) int64
 	UpdatePlaylist(model.Playlist, int) int64
@@ -44,13 +44,13 @@ func (playlistRepo) FindAllByWpid(id int) ([]model.Playlist, error) {
 	}
 	return playlist, nil
 }
-func (playlistRepo) FindByID(id int) ([]model.Playlist, error) {
-	playlist := []model.Playlist{}
+func (playlistRepo) FindByID(id int) (*model.Playlist, error) {
+	playlist := model.Playlist{}
 	result := db.Preload("PlaylistDetail.Music.MusicType").Where("pid = ?", id).Find(&playlist)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return playlist, nil
+	return &playlist, nil
 }
 
 // Join
