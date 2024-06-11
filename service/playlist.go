@@ -19,6 +19,7 @@ type PlaylistService interface {
 	GetByID(key int) (*model.Playlist, error)
 	Save(model.Playlist) int64
 	Update(playlist model.Playlist, id int) int64
+	Delete(id int) (int64, error)
 }
 
 func (playlistServ) GetAllPlaylist() ([]model.Playlist, error) {
@@ -63,5 +64,16 @@ func (playlistServ) Update(playlist model.Playlist, id int) int64 {
 		return 0
 	} else {
 		return -1
+	}
+}
+
+func (playlistServ) Delete(id int) (int64, error) {
+	row, error := playlistRepo.DeletePlaylist(id)
+	if row > 0 {
+		return 1, error
+	} else if row == 0 {
+		return 0, error
+	} else {
+		return -1, error
 	}
 }
