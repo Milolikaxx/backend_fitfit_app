@@ -19,6 +19,7 @@ func NewPlaylistController(router *gin.Engine) {
 		ping.GET(":id", getPlaylistByID)
 		ping.POST("/save", SavePlaylist)
 		ping.PUT("/update/:id", UpdatePlaylist)
+		ping.DELETE("/del/:id", DeletePlaylist)
 	}
 }
 
@@ -65,4 +66,15 @@ func UpdatePlaylist(ctx *gin.Context) {
 	ctx.ShouldBindJSON(&playlist)
 	err := playlistServ.Update(playlist, id)
 	ctx.JSON(http.StatusOK, err)
+}
+
+func DeletePlaylist(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	wp, err := playlistServ.Delete(id)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"error": err,
+		})
+	}
+	ctx.JSON(http.StatusOK, wp)
 }

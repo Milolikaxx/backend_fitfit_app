@@ -23,9 +23,9 @@ type playlistRepository interface {
 	FindAll() ([]model.Playlist, error)
 	FindAllByWpid(id int) ([]model.Playlist, error)
 	FindByID(key int) (*model.Playlist, error)
-
 	AddPlaylist(model.Playlist) int64
 	UpdatePlaylist(model.Playlist, int) int64
+	DeletePlaylist(key int) (int, error)
 }
 
 func (playlistRepo) FindAll() ([]model.Playlist, error) {
@@ -83,4 +83,12 @@ func (playlistRepo) UpdatePlaylist(playlist model.Playlist, id int) int64 {
 		log.Printf("Update Playlist failed\nAffected row : %v", result.RowsAffected)
 	}
 	return result.RowsAffected
+}
+
+func (playlistRepo) DeletePlaylist(id int) (int, error) {
+	result := db.Delete(&model.Playlist{}, id)
+	if result.Error != nil {
+		return int(result.RowsAffected), result.Error
+	}
+	return int(result.RowsAffected), nil
 }
