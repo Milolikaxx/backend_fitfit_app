@@ -19,7 +19,7 @@ func NewWpController(router *gin.Engine) {
 		ping.POST("/save", Save)
 		ping.PUT("/update/:id", UpdateWorkProfile)
 		ping.GET("/user/:id", getListWpByUid)
-		ping.DELETE("/delprofile/:id", getListWpByUid)
+		ping.DELETE("/delprofile/:id", DeleteWorkProfile)
 	}
 }
 
