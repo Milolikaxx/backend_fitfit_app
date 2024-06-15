@@ -17,6 +17,7 @@ func NewPlaylistController(router *gin.Engine) {
 		ping.GET("", getAllPlaylist)
 		ping.GET("/wp/:id", getAllPlaylistByWpid)
 		ping.GET(":id", getPlaylistByID)
+		ping.GET("/nomusic/:id", getPlaylistWithOutMusicByID)
 		ping.POST("/save", SavePlaylist)
 		ping.PUT("/update/:id", UpdatePlaylist)
 		ping.DELETE("/del/:id", DeletePlaylist)
@@ -44,7 +45,7 @@ func getAllPlaylistByWpid(ctx *gin.Context) {
 }
 func getPlaylistByID(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	user, err := playlistServ.GetByID(id)
+	user, err := playlistServ.GetPlaylistMusicByID(id)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"error": err,
@@ -52,7 +53,16 @@ func getPlaylistByID(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, user)
 }
-
+func getPlaylistWithOutMusicByID(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	user, err := playlistServ.GetPlaylistWithOutMusicByID(id)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"error": err,
+		})
+	}
+	ctx.JSON(http.StatusOK, user)
+}
 func SavePlaylist(ctx *gin.Context) {
 	playlist := model.Playlist{}
 	ctx.ShouldBindJSON(&playlist)
