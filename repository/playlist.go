@@ -23,6 +23,7 @@ type playlistRepository interface {
 	FindAll() ([]model.Playlist, error)
 	FindAllByWpid(id int) ([]model.Playlist, error)
 	FindByID(key int) (*model.Playlist, error)
+	FindWithoutMusicByID(id int) (*model.Playlist, error)
 	AddPlaylist(model.Playlist) int64
 	UpdatePlaylist(model.Playlist, int) int64
 	DeletePlaylist(key int) (int, error)
@@ -38,7 +39,7 @@ func (playlistRepo) FindAll() ([]model.Playlist, error) {
 }
 func (playlistRepo) FindAllByWpid(id int) ([]model.Playlist, error) {
 	playlist := []model.Playlist{}
-	result := db.Where("wpid = ?", id).Find(&playlist)
+	result := db.Select("pid", "wpid", "playlist_name", "duration_playlist", "image_playlist").Where("wpid = ?", id).Find(&playlist)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -47,6 +48,15 @@ func (playlistRepo) FindAllByWpid(id int) ([]model.Playlist, error) {
 func (playlistRepo) FindByID(id int) (*model.Playlist, error) {
 	playlist := model.Playlist{}
 	result := db.Preload("PlaylistDetail.Music.MusicType").Where("pid = ?", id).Find(&playlist)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &playlist, nil
+}
+
+func (playlistRepo) FindWithoutMusicByID(id int) (*model.Playlist, error) {
+	playlist := model.Playlist{}
+	result := db.Where("pid = ?", id).Find(&playlist)
 	if result.Error != nil {
 		return nil, result.Error
 	}
