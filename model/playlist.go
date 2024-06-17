@@ -7,6 +7,7 @@ import (
 type Playlist struct {
 	Pid              int              `gorm:"column:pid;primaryKey;autoIncrement"`
 	Wpid             int              `gorm:"column:wpid;not null"`
+	WorkoutProfile   WorkoutProfile   `gorm:"foreignKey:Wpid;references:Wpid"`
 	PlaylistName     string           `gorm:"column:playlist_name;not null"`
 	DurationPlaylist float64          `gorm:"column:duration_playlist;not null"`
 	ImagePlaylist    string           `gorm:"column:image_playlist;not null"`

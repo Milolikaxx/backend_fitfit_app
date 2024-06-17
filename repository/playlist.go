@@ -39,7 +39,7 @@ func (playlistRepo) FindAll() ([]model.Playlist, error) {
 }
 func (playlistRepo) FindAllByWpid(id int) ([]model.Playlist, error) {
 	playlist := []model.Playlist{}
-	result := db.Select("pid", "wpid", "playlist_name", "duration_playlist", "image_playlist").Where("wpid = ?", id).Find(&playlist)
+	result := db.Preload("WorkoutProfile.WorkoutMusictype.MusicType").Where("wpid = ?", id).Find(&playlist)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -56,7 +56,7 @@ func (playlistRepo) FindByID(id int) (*model.Playlist, error) {
 
 func (playlistRepo) FindWithoutMusicByID(id int) (*model.Playlist, error) {
 	playlist := model.Playlist{}
-	result := db.Where("pid = ?", id).Find(&playlist)
+	result := db.Preload("WorkoutProfile.WorkoutMusictype.MusicType").Where("pid = ?", id).Find(&playlist)
 	if result.Error != nil {
 		return nil, result.Error
 	}
