@@ -42,7 +42,6 @@ func (musicRepo) RandomMusicByMusictype(id int) (*model.Music, error) {
 	return &music, nil
 }
 
-// !!::!!
 func (musicRepo) FindAllMusicByLevel(bpm int, musicType []int) ([]model.Music, error) {
 	music := []model.Music{}
 	result := db.Joins("MusicType").Where("music.bpm <= ?", bpm).Where("music.mtid in (?)", musicType).Find(&music)
