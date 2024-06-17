@@ -10,7 +10,7 @@ type Post struct {
 	Pid          int       `gorm:"column:pid;NOT NULL"`
 	PlaylistName string    `gorm:"column:playlist_name;NOT NULL"`
 	Description  string    `gorm:"column:description;NOT NULL"`
-	PDatetime    time.Time `gorm:"column:p_datetime;NOT NULL"`
+	PDatetime    time.Time `gorm:"column:p_datetime;default:CURRENT_TIMESTAMP;NOT NULL"`
 	CreatedAt    time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP;NOT NULL"`
 	UpdatedAt    time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP;NOT NULL"`
 }
