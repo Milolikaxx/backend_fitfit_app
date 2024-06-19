@@ -9,7 +9,6 @@ import (
 	"math/rand"
 	"net/http"
 	"reflect"
-	"slices"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -149,7 +148,8 @@ func CreatePlaylistWP(wpid int) ([]model.Music, error) {
 	levelProceed_used := levelProceed[lvl] //ระดับ Cardio ตามเลเวล
 	levelProceed_curr := 0                 //เลเวลปัจจุบันที่ขยับมา ขนาดออกกำลังกาย
 	var musicList []model.Music
-	var usedSongs = make([]string, 0) // used songs
+	// var usedSongs = make([]string, 0) // used songs
+	found := false
 	fmt.Println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ")
 	for {
 		if timeRemain <= 0 {
@@ -164,15 +164,20 @@ func CreatePlaylistWP(wpid int) ([]model.Music, error) {
 
 		idx := rand.Int() % length
 		m := groupBy(groupMusic, levelProceed_curr)[idx]
-		//Check Dup Song
-		if slices.Contains(usedSongs, m.Name) {
+		for _, song := range musicList {
+			if song.Name == m.Name {
+				found = true
+				break
+			}
+		}
+		if found {
 			fmt.Printf("inList : %s\n", m.Name)
 			continue //เพลงซ้ำ
 		} else {
-			usedSongs = append(usedSongs, m.Name)
+			musicList = append(musicList, m)
 			fmt.Printf("add : %s , time : %f\n ", m.Name, m.Duration)
 		}
-		musicList = append(musicList, m)
+
 		timeMusicSec := int(m.Duration)*60 + int(math.Round((m.Duration-math.Trunc(m.Duration))*60))
 		timeRemain -= timeMusicSec
 		timeMusicThisLevelSec += timeMusicSec
