@@ -2,7 +2,7 @@ FROM golang
 
 WORKDIR /app
 
-ARG CACHEBUST=0
+ARG CACHEBUST=1
 
 RUN git clone -b main https://github.com/Milolikaxx/backend_fitfit_app.git .
 
