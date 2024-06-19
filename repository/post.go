@@ -28,7 +28,7 @@ type postRepository interface {
 
 func (postRepo) FindAll() ([]model.Post, error) {
 	posts := []model.Post{}
-	result := db.Joins("User").Omit("post.created_at", "post.updated_at", "birthday", "email", "password", "google_id", "created_at", "updated_at").Find(&posts)
+	result := db.Joins("User").Find(&posts)
 	// result := db.Joins("Playlist").Find(&posts)
 	if result.Error != nil {
 		return nil, result.Error
