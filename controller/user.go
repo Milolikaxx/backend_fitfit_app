@@ -19,6 +19,7 @@ func NewUserController(router *gin.Engine) {
 		ping.GET("/ByName", getByEmail)
 		ping.GET(":id", getByID)
 		ping.POST("/register", register)
+		ping.POST("/loginGoogle", loginGoogle)
 		ping.POST("/login", login)
 		ping.PUT("/update/:id", UpdateUser)
 		ping.POST("/updatepassword/:id", UpdateUserPassword)
@@ -63,6 +64,13 @@ func login(ctx *gin.Context) {
 	user := model.User{}
 	ctx.ShouldBindJSON(&user)
 	acc := userServ.Login(user)
+	ctx.JSON(http.StatusOK, acc)
+}
+
+func loginGoogle(ctx *gin.Context) {
+	user := model.User{}
+	ctx.ShouldBindJSON(&user)
+	acc := userServ.LoginGoogle(user)
 	ctx.JSON(http.StatusOK, acc)
 }
 

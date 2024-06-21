@@ -23,6 +23,7 @@ type UserService interface {
 	GetUserByID(key int) (*model.User, error)
 	GetUserByEmail(key string) (*model.User, error)
 	GetUserByName(key string) (*model.User, error)
+	LoginGoogle(user model.User) *model.User
 	Update(model.User, int) int64
 	UpdateUserPassword(model.RePassword, int) int64
 }
@@ -61,7 +62,7 @@ func (userServ) GetUserByName(name string) (*model.User, error) {
 
 func (userServ) Login(user model.User) *model.User {
 	usr, _ := userRepo.FindByEmail(user.Email)
-	if usr != nil {
+	if usr.Uid > 0 {
 		if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(user.Password)) == nil {
 			log.Println("รหัสผ่านตรง")
 			return usr
@@ -75,6 +76,22 @@ func (userServ) Login(user model.User) *model.User {
 	}
 }
 
+func (userServ) LoginGoogle(user model.User) *model.User {
+	usr, _ := userRepo.FindByGoogleID(user.GoogleID)
+	if usr.Uid > 0 {
+		log.Println("1")
+		return usr
+	} else {
+		userGoogle, _ := userRepo.RegisterGoogle(user)
+		if userGoogle != nil {
+			log.Println("2")
+			return userGoogle
+		} else {
+			log.Println("3")
+			return nil
+		}
+	}
+}
 func (userServ) Register(user model.User) int64 {
 	usr, _ := userRepo.FindByEmail(user.Email)
 	if usr.Uid == 0 {

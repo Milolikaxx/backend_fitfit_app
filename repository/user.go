@@ -24,6 +24,8 @@ type userRepository interface {
 	Register(model.User) int64
 	FindByID(key int) (*model.User, error)
 	FindByEmail(key string) (*model.User, error)
+	FindByGoogleID(goo_id string) (*model.User, error)
+	RegisterGoogle(user model.User) (*model.User, error)
 	FindByName(key string) (*model.User, error)
 	UpdateUser(model.User, int) int64
 }
@@ -55,6 +57,14 @@ func (userRepo) FindByEmail(email string) (*model.User, error) {
 	return &user, nil
 }
 
+func (userRepo) FindByGoogleID(goo_id string) (*model.User, error) {
+	user := model.User{}
+	result := db.Where("google_id = ?", goo_id).Find(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
+}
 func (userRepo) FindByName(name string) (*model.User, error) {
 	user := model.User{}
 	result := db.Where("name= ?", name).Find(&user)
@@ -74,6 +84,15 @@ func (userRepo) Register(user model.User) int64 {
 	return result.RowsAffected
 }
 
+func (userRepo) RegisterGoogle(user model.User) (*model.User, error) {
+	result := db.Omit("birthday").Create(&user)
+	if result.RowsAffected > 0 {
+		log.Printf("Register complete\nAffected row : %v", result.RowsAffected)
+	} else {
+		log.Printf("Register failed %v", result.RowsAffected)
+	}
+	return &user, nil
+}
 func (userRepo) UpdateUser(user model.User, id int) int64 {
 	result := db.Model(&model.User{}).Where("uid = ?", id).Updates(&user)
 	if result.RowsAffected > 0 {
