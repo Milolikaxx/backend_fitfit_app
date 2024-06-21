@@ -4,9 +4,10 @@ import (
 	"backend_fitfit_app/model"
 	"backend_fitfit_app/repository"
 	"backend_fitfit_app/service"
-	"fmt"
 	"math"
 	"math/rand"
+
+	"fmt"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -67,6 +68,7 @@ func getMusicList(ctx *gin.Context) {
 }
 
 var bpm = []int{100, 114, 133, 152, 171, 190}
+
 var levelProceed = [][]int{
 	{100},          //Lv.0
 	{10, 35},       //Lv.1
@@ -81,9 +83,9 @@ type MusicGroup struct {
 	music model.Music
 }
 
-func groupBy(maps []MusicGroup, level int) []model.Music {
+func groupBy(music []MusicGroup, level int) []model.Music {
 	groups := make([]model.Music, 0)
-	for _, m := range maps {
+	for _, m := range music {
 		if m.level == level {
 			groups = append(groups, m.music)
 		}
@@ -91,28 +93,7 @@ func groupBy(maps []MusicGroup, level int) []model.Music {
 	return groups
 }
 
-func CreatePlaylistWP(wpid int) ([]model.Music, error) {
-	//workout_profile
-	var wpRepo = repository.NewWpRepository()
-	wp, _ := wpRepo.FindByWpid(wpid)
-	fmt.Printf("wp:%v  \n\n", wp)
-	//infomation
-	lvl := wp.LevelExercise
-	duration := int(wp.Duration * 60)
-	exeType := wp.ExerciseType
-	var musicType []int
-	for _, t := range wp.WorkoutMusictype {
-		musicType = append(musicType, t.Mtid)
-	}
-	fmt.Printf("infomation  lvl:%d  duration:%d  type:%s  musicType:%v  bpm:%d  \n\n", lvl, duration, exeType, musicType, bpm[lvl])
-
-	//music - level
-	musicRepo := repository.NewMusicRepository()
-	music, _ := musicRepo.FindAllMusicByLevel(bpm[lvl], musicType)
-	fmt.Printf("result music:%d\n\n", len(music))
-
-	//grouping
-	fmt.Printf("music type %s\n\n", reflect.TypeOf(music))
+func groupMusic(music []model.Music, lvl int) []MusicGroup {
 	var groupMusic []MusicGroup
 	for i := 0; i <= lvl; i++ {
 		for _, m := range music {
@@ -133,7 +114,33 @@ func CreatePlaylistWP(wpid int) ([]model.Music, error) {
 			}
 		}
 	}
+	return groupMusic
+}
+func CreatePlaylistWP(wpid int) ([]model.Music, error) {
+	//workout_profile
+	var wpRepo = repository.NewWpRepository()
+	wp, _ := wpRepo.FindByWpid(wpid)
+	fmt.Printf("wp:%v  \n\n", wp)
+	//infomation
+	lvl := wp.LevelExercise
+	duration := int(wp.Duration * 60)
+	// durationEx := wp.Duration
+	exeType := wp.ExerciseType
+	var musicType []int
+	for _, t := range wp.WorkoutMusictype {
+		musicType = append(musicType, t.Mtid)
+	}
+	fmt.Printf("infomation  lvl:%d  duration:%d  type:%s  musicType:%v  bpm:%d  \n\n", lvl, duration, exeType, musicType, bpm[lvl])
 
+	//music - level
+	musicRepo := repository.NewMusicRepository()
+	music, _ := musicRepo.FindAllMusicByLevel(bpm[lvl], musicType)
+	fmt.Printf("result music:%d\n\n", len(music))
+
+	//grouping
+	fmt.Printf("music type %s\n\n", reflect.TypeOf(music))
+	groupMusic := groupMusic(music, lvl)
+	//groupBy LV
 	fmt.Printf("level0 = %d เพลง\n ", len(groupBy(groupMusic, 0)))
 	fmt.Printf("level1 = %d เพลง\n", len(groupBy(groupMusic, 1)))
 	fmt.Printf("level2 = %d เพลง\n", len(groupBy(groupMusic, 2)))
@@ -141,7 +148,45 @@ func CreatePlaylistWP(wpid int) ([]model.Music, error) {
 	fmt.Printf("level4 = %d เพลง\n", len(groupBy(groupMusic, 4)))
 	fmt.Printf("level5 = %d เพลง\n\n", len(groupBy(groupMusic, 5)))
 
-	//proceed
+	//Process
+	// var musicList []model.Music
+	// if lvl == 2 {
+	// 	if durationEx == 10 {
+	// 		//ช่วง 1
+	// 		groupedMusic1 := groupBy(groupMusic, 1)
+	// 		length1 := len(groupedMusic1)
+	// 		if length1 == 0 {
+	// 			return musicList, fmt.Errorf("ไม่มีเพลงที่สามารถใช้ได้ในระดับปัจจุบัน")
+	// 		}
+
+	// 		idx1 := rand.Int() % length1
+	// 		m1 := groupBy(groupMusic, 1)[idx1]
+
+	// 		musicList = append(musicList, m1)
+
+	// 		//ช่วง 2
+	// 		groupedMusic2 := groupBy(groupMusic, 2)
+	// 		length2 := len(groupedMusic2)
+	// 		if length2 == 0 {
+	// 			return musicList, fmt.Errorf("ไม่มีเพลงที่สามารถใช้ได้ในระดับปัจจุบัน")
+	// 		}
+
+	// 		idx2 := rand.Int() % length2
+	// 		m2 := groupBy(groupMusic, 2)[idx2]
+	// 		musicList = append(musicList, m2)
+	// 		// ช่วง 3
+	// 		groupedMusic3 := groupBy(groupMusic, 1)
+	// 		length3 := len(groupedMusic3)
+	// 		if length3 == 0 {
+	// 			return musicList, fmt.Errorf("ไม่มีเพลงที่สามารถใช้ได้ในระดับปัจจุบัน")
+	// 		}
+
+	// 		idx3 := rand.Int() % length3
+	// 		m3 := groupBy(groupMusic, 1)[idx3]
+	// 		musicList = append(musicList, m3)
+	// 	}
+	// }
+	//Process 1
 	fmt.Println(levelProceed[lvl])
 	timeRemain := duration                 //เวลาที่ยังเหลือ
 	timeMusicThisLevelSec := 0             //เวลาเพลงของเลเวลนี้
@@ -193,6 +238,7 @@ func CreatePlaylistWP(wpid int) ([]model.Music, error) {
 			fmt.Printf("หลัง +- แล้ว levelProceed_curr:%d \n", levelProceed_curr)
 		}
 	}
+
 	fmt.Printf("musicList:%d\n\n", len(musicList))
 	return musicList, nil
 }

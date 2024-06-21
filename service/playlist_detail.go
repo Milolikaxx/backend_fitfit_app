@@ -52,8 +52,3 @@ func (playlistDetailServ) Delete(id int) (int64, error) {
 		return -1, error
 	}
 }
-
-type MusicGroup struct {
-	level int
-	music model.Music
-}
