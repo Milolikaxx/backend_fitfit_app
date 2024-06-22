@@ -4,6 +4,7 @@ import (
 	"backend_fitfit_app/model"
 	"backend_fitfit_app/repository"
 	"backend_fitfit_app/service"
+	"log"
 	"math"
 	"math/rand"
 
@@ -24,6 +25,7 @@ func NewPlaylistDetailController(router *gin.Engine) {
 		ping.POST("/addmusic", AddMusic)
 		ping.DELETE("/delete/:id", DeleteMusic)
 		ping.GET("/musiclist/:id", getMusicList)
+		ping.GET("/rand/", randSong1)
 	}
 }
 
@@ -241,4 +243,60 @@ func CreatePlaylistWP(wpid int) ([]model.Music, error) {
 
 	fmt.Printf("musicList:%d\n\n", len(musicList))
 	return musicList, nil
+}
+
+func randSong1(ctx *gin.Context) {
+
+	rand := model.RandMusic{}
+	ctx.ShouldBindJSON(&rand)
+	music, err := ReplaceSong(rand)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, music)
+}
+
+func ReplaceSong(randOld model.RandMusic) ([]model.Music, error) {
+
+	//workout_profile
+	var wpRepo = repository.NewWpRepository()
+	wp, _ := wpRepo.FindByWpid(randOld.Wpid)
+	fmt.Printf("wp:%v  \n\n", wp)
+	//infomation
+	lvl := wp.LevelExercise
+	duration := int(wp.Duration * 60)
+	// durationEx := wp.Duration
+	exeType := wp.ExerciseType
+	var musicType []int
+	for _, t := range wp.WorkoutMusictype {
+		musicType = append(musicType, t.Mtid)
+	}
+	fmt.Printf("infomation  lvl:%d  duration:%d  type:%s  musicType:%v  bpm:%d  \n\n", lvl, duration, exeType, musicType, bpm[lvl])
+
+	// Fetch music
+	//music - level
+	musicRepo := repository.NewMusicRepository()
+	music, _ := musicRepo.FindAllMusicByLevel(bpm[lvl], musicType)
+	fmt.Printf("result music:%d\n\n", len(music))
+
+	// Find a new song
+	originalSong := randOld.MusicList[randOld.Index]
+	minBPM := int(float64(originalSong.Bpm) * 0.95)
+	maxBPM := int(float64(originalSong.Bpm) * 1.05)
+
+	var newSong model.Music
+	for {
+		idx := rand.Intn(len(music))
+		s := music[idx]
+		if s.Bpm >= minBPM && s.Bpm <= maxBPM {
+			newSong = s
+			break
+		}
+	}
+
+	// Replace the song in the music list
+	log.Printf("music %s , Bpm : %d", newSong.Name, newSong.Bpm)
+	randOld.MusicList = append(randOld.MusicList[:randOld.Index], append([]model.Music{newSong}, randOld.MusicList[randOld.Index:]...)...)
+	return randOld.MusicList, nil
 }
