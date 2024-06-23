@@ -28,8 +28,9 @@ type postRepository interface {
 
 func (postRepo) FindAll() ([]model.Post, error) {
 	posts := []model.Post{}
-	result := db.Joins("User").Find(&posts)
-	// result := db.Joins("Playlist").Find(&posts)
+	// result := db.Joins("User").
+	// 	Find(&posts)
+	result := db.Joins("User").Preload("Playlist.WorkoutProfile.WorkoutMusictype.MusicType").Find(&posts)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -38,7 +39,7 @@ func (postRepo) FindAll() ([]model.Post, error) {
 
 func (postRepo) FindByID(id int) (*model.Post, error) {
 	post := model.Post{}
-	result := db.Where("wpid = ?", id).Find(&post)
+	result := db.Preload("Playlist.WorkoutProfile.WorkoutMusictype.MusicType").Where("uid = ?", id).Find(&post)
 	if result.Error != nil {
 		return nil, result.Error
 	}

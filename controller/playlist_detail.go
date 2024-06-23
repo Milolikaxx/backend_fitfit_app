@@ -258,7 +258,6 @@ func randSong1(ctx *gin.Context) {
 }
 
 func ReplaceSong(randOld model.RandMusic) ([]model.Music, error) {
-
 	//workout_profile
 	var wpRepo = repository.NewWpRepository()
 	wp, _ := wpRepo.FindByWpid(randOld.Wpid)
