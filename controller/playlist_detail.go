@@ -25,7 +25,7 @@ func NewPlaylistDetailController(router *gin.Engine) {
 		ping.POST("/addmusic", AddMusic)
 		ping.DELETE("/delete/:id", DeleteMusic)
 		ping.GET("/musiclist/:id", getMusicList)
-		ping.GET("/rand/", randSong1)
+		ping.GET("/rand", randSong1)
 	}
 }
 
@@ -219,6 +219,7 @@ func CreatePlaylistWP(wpid int) ([]model.Music, error) {
 		}
 		if found {
 			fmt.Printf("inList : %s\n", m.Name)
+			found = false
 			continue //เพลงซ้ำ
 		} else {
 			musicList = append(musicList, m)
@@ -257,10 +258,10 @@ func randSong1(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, music)
 }
 
-func ReplaceSong(randOld model.RandMusic) ([]model.Music, error) {
+func ReplaceSong(data model.RandMusic) ([]model.Music, error) {
 	//workout_profile
 	var wpRepo = repository.NewWpRepository()
-	wp, _ := wpRepo.FindByWpid(randOld.Wpid)
+	wp, _ := wpRepo.FindByWpid(data.Wpid)
 	fmt.Printf("wp:%v  \n\n", wp)
 	//infomation
 	lvl := wp.LevelExercise
@@ -280,7 +281,7 @@ func ReplaceSong(randOld model.RandMusic) ([]model.Music, error) {
 	fmt.Printf("result music:%d\n\n", len(music))
 
 	// Find a new song
-	originalSong := randOld.MusicList[randOld.Index]
+	originalSong := data.MusicList[data.Index]
 	minBPM := int(float64(originalSong.Bpm) * 0.95)
 	maxBPM := int(float64(originalSong.Bpm) * 1.05)
 
@@ -296,6 +297,6 @@ func ReplaceSong(randOld model.RandMusic) ([]model.Music, error) {
 
 	// Replace the song in the music list
 	log.Printf("music %s , Bpm : %d", newSong.Name, newSong.Bpm)
-	randOld.MusicList = append(randOld.MusicList[:randOld.Index], append([]model.Music{newSong}, randOld.MusicList[randOld.Index:]...)...)
-	return randOld.MusicList, nil
+	data.MusicList[data.Index] = newSong
+	return data.MusicList, nil
 }
