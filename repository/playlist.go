@@ -82,7 +82,6 @@ func (playlistRepo) AddPlaylist(playlist model.Playlist) int64 {
 		log.Printf("Add Playlist failed %v", result.RowsAffected)
 		return 0
 	}
-
 }
 
 func (playlistRepo) UpdatePlaylist(playlist model.Playlist, id int) int64 {
