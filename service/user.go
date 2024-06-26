@@ -22,7 +22,10 @@ type UserService interface {
 	Login(model.User) *model.User
 	GetUserByID(key int) (*model.User, error)
 	GetUserByEmail(key string) (*model.User, error)
+	GetUserByName(key string) (*model.User, error)
+	LoginGoogle(user model.User) *model.User
 	Update(model.User, int) int64
+	UpdateUserPassword(model.RePassword, int) int64
 }
 
 func (userServ) GetAllUsers() ([]model.User, error) {
@@ -49,9 +52,17 @@ func (userServ) GetUserByEmail(email string) (*model.User, error) {
 	return user, nil
 }
 
+func (userServ) GetUserByName(name string) (*model.User, error) {
+	user, err := userRepo.FindByName(name)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (userServ) Login(user model.User) *model.User {
 	usr, _ := userRepo.FindByEmail(user.Email)
-	if usr != nil {
+	if usr.Uid > 0 {
 		if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(user.Password)) == nil {
 			log.Println("รหัสผ่านตรง")
 			return usr
@@ -65,30 +76,43 @@ func (userServ) Login(user model.User) *model.User {
 	}
 }
 
+func (userServ) LoginGoogle(user model.User) *model.User {
+	usr, _ := userRepo.FindByGoogleID(user.GoogleID)
+	if usr.Uid > 0 {
+		log.Println("1")
+		return usr
+	} else {
+		userGoogle, _ := userRepo.RegisterGoogle(user)
+		if userGoogle != nil {
+			log.Println("2")
+			return userGoogle
+		} else {
+			log.Println("3")
+			return nil
+		}
+	}
+}
 func (userServ) Register(user model.User) int64 {
 	usr, _ := userRepo.FindByEmail(user.Email)
 	if usr.Uid == 0 {
-		pwdHash := hashPassword(user.Password)
-		user.Password = pwdHash
-		rowsAff := userRepo.Register(user)
-		if rowsAff > 0 {
-			return 1
-		} else if rowsAff == 0 {
-			return 0
+		usrName, _ := userRepo.FindByName(user.Name)
+		if usrName.Uid == 0 {
+			pwdHash := hashPassword(user.Password)
+			user.Password = pwdHash
+			rowsAff := userRepo.Register(user)
+			if rowsAff > 0 {
+				return 1
+			} else if rowsAff == 0 {
+				return 0
+			} else {
+				return -1
+			}
 		} else {
-			return -1
+			return 3
 		}
 	} else {
-		return 0
+		return 2
 	}
-}
-
-func hashPassword(pwd string) string {
-	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
-	if err != nil {
-		log.Println(err)
-	}
-	return string(hash)
 }
 
 func (userServ) Update(user model.User, id int) int64 {
@@ -100,4 +124,50 @@ func (userServ) Update(user model.User, id int) int64 {
 	} else {
 		return -1
 	}
+}
+
+func (userServ) UpdateUserPassword(rePwd model.RePassword, id int) int64 {
+	// เช็ครหัสผ่าน
+	usr, _ := userRepo.FindByID(id)
+	if usr.Uid != 0 {
+		if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(rePwd.Password)) == nil {
+			log.Println("รหัสผ่าน [ ตรง ]")
+			pwdHash := hashPassword(rePwd.PasswordNew)
+			usr.Password = pwdHash
+			rowsAff := userRepo.UpdateUser(*usr, id)
+			if rowsAff > 0 {
+				return 1
+			} else if rowsAff == 0 {
+				return 0
+			} else {
+				return -1
+			}
+		} else {
+			log.Println("รหัสผ่าน [ ไม่ตรง ]")
+			return 2
+		}
+	} else {
+		log.Println("ไม่มี!!!")
+		return 3
+	}
+
+	// บันทึกรหัสผ่าน
+	// pwdHash := hashPassword(user.Password)
+	// user.Password = pwdHash
+	// rowsAff := userRepo.UpdateUser(user, id)
+	// if rowsAff > 0 {
+	// 	return 1
+	// } else if rowsAff == 0 {
+	// 	return 0
+	// } else {
+	// 	return -1
+	// }
+}
+
+func hashPassword(pwd string) string {
+	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+	if err != nil {
+		log.Println(err)
+	}
+	return string(hash)
 }

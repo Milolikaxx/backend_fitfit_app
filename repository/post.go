@@ -24,11 +24,14 @@ type postRepository interface {
 	FindByID(key int) (*model.Post, error)
 	AddPost(model.Post) int64
 	UpdatePost(wp model.Post, id int) int64
+	DeletePost(id int) (int, error)
 }
 
 func (postRepo) FindAll() ([]model.Post, error) {
 	posts := []model.Post{}
-	result := db.Find(&posts)
+	// result := db.Joins("User").
+	// 	Find(&posts)
+	result := db.Joins("User").Preload("Playlist.WorkoutProfile.WorkoutMusictype.MusicType").Find(&posts)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -37,7 +40,7 @@ func (postRepo) FindAll() ([]model.Post, error) {
 
 func (postRepo) FindByID(id int) (*model.Post, error) {
 	post := model.Post{}
-	result := db.Where("wpid = ?", id).Find(&post)
+	result := db.Preload("Playlist.WorkoutProfile.WorkoutMusictype.MusicType").Where("uid = ?", id).Find(&post)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -62,4 +65,12 @@ func (postRepo) UpdatePost(post model.Post, id int) int64 {
 		log.Printf("Update Post failed\nAffected row : %v", result.RowsAffected)
 	}
 	return result.RowsAffected
+}
+
+func (postRepo) DeletePost(id int) (int, error) {
+	result := db.Delete(&model.Post{}, id)
+	if result.Error != nil {
+		return int(result.RowsAffected), result.Error
+	}
+	return int(result.RowsAffected), nil
 }

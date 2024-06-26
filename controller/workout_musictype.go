@@ -15,13 +15,13 @@ func NewWpMusicTypeController(router *gin.Engine) {
 	ping := router.Group("/wpmt")
 	{
 
-		ping.GET(":id", getByWPID)
+		ping.GET(":id", GetByWPID)
 		ping.POST("/save", SaveWpMusicType)
 		ping.PUT("/update/:id", UpdateWpMusicType)
 	}
 }
 
-func getByWPID(ctx *gin.Context) {
+func GetByWPID(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	user, err := wpmtServ.GetByWPID(id)
 	if err != nil {

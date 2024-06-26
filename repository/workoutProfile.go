@@ -21,8 +21,11 @@ func NewWpRepository() wpRepository {
 
 type wpRepository interface {
 	FindAll() ([]model.WorkoutProfile, error)
-	FindByID(key int) (*model.WorkoutProfile, error)
+	FindByWpid(key int) (*model.WorkoutProfile, error)
+	FindListByUid(key int) ([]model.WorkoutProfile, error)
+	// FindByUID(key int) ([]model.WorkoutProfile, error)
 	AddWorkProfile(model.WorkoutProfile) int64
+	DeleteProfile(id int) (int, error)
 	UpdateWorkProfile(wp model.WorkoutProfile, id int) int64
 }
 
@@ -35,23 +38,51 @@ func (u wpRepo) FindAll() ([]model.WorkoutProfile, error) {
 	return wps, nil
 }
 
-func (wpRepo) FindByID(id int) (*model.WorkoutProfile, error) {
+func (wpRepo) FindByWpid(id int) (*model.WorkoutProfile, error) {
 	wp := model.WorkoutProfile{}
-	result := db.Where("wpid = ?", id).Find(&wp)
+	result := db.Preload("WorkoutMusictype.MusicType").Where("workout_profile.wpid = ?", id).Find(&wp)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return &wp, nil
 }
 
+func (wpRepo) FindListByUid(id int) ([]model.WorkoutProfile, error) {
+	wps := []model.WorkoutProfile{}
+	// result := db.Joins("WorkoutMusictype").Joins("WorkoutMusictype.MusicType").Where("workout_profile.uid = ?", id).Find(&wps)
+	result := db.Preload("WorkoutMusictype.MusicType").Where("workout_profile.uid = ?", id).Find(&wps)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return wps, nil
+}
+
+// func (wpRepo) FindByUID(uid int) ([]model.WorkoutProfile, error) {
+// 	wps := []model.WorkoutProfile{}
+// 	result := db.Where("uid = ?", uid).Find(&wps)
+// 	if result.Error != nil {
+// 		return nil, result.Error
+// 	}
+// 	return wps, nil
+// }
+
 func (wpRepo) AddWorkProfile(wp model.WorkoutProfile) int64 {
 	result := db.Create(&wp)
 	if result.RowsAffected > 0 {
 		log.Printf("Add workoutProfile complete\nAffected row : %v", result.RowsAffected)
+		return int64(wp.Wpid)
 	} else {
 		log.Printf("Add workoutProfile failed %v", result.RowsAffected)
+		return 0
 	}
-	return result.RowsAffected
+}
+
+func (wpRepo) DeleteProfile(id int) (int, error) {
+	result := db.Delete(&model.WorkoutProfile{}, id)
+	if result.Error != nil {
+		return int(result.RowsAffected), result.Error
+	}
+	return int(result.RowsAffected), nil
 }
 
 func (wpRepo) UpdateWorkProfile(wp model.WorkoutProfile, id int) int64 {
