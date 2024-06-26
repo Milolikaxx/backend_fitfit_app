@@ -24,6 +24,7 @@ type postRepository interface {
 	FindByID(key int) (*model.Post, error)
 	AddPost(model.Post) int64
 	UpdatePost(wp model.Post, id int) int64
+	DeletePost(id int) (int, error)
 }
 
 func (postRepo) FindAll() ([]model.Post, error) {
@@ -64,4 +65,12 @@ func (postRepo) UpdatePost(post model.Post, id int) int64 {
 		log.Printf("Update Post failed\nAffected row : %v", result.RowsAffected)
 	}
 	return result.RowsAffected
+}
+
+func (postRepo) DeletePost(id int) (int, error) {
+	result := db.Delete(&model.Post{}, id)
+	if result.Error != nil {
+		return int(result.RowsAffected), result.Error
+	}
+	return int(result.RowsAffected), nil
 }
