@@ -18,6 +18,7 @@ type PostService interface {
 	GetPostByID(key int) (*model.Post, error)
 	Save(model.Post) int64
 	Update(wp model.Post, id int) int64
+	Delete(id int) (int64, error)
 }
 
 func (postServ) GetAllPosts() ([]model.Post, error) {
@@ -55,5 +56,16 @@ func (p postServ) Update(post model.Post, id int) int64 {
 		return 0
 	} else {
 		return -1
+	}
+}
+
+func (postServ) Delete(id int) (int64, error) {
+	row, error := postRepo.DeletePost(id)
+	if row > 0 {
+		return 1, error
+	} else if row == 0 {
+		return 0, error
+	} else {
+		return -1, error
 	}
 }
