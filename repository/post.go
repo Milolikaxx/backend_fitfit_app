@@ -39,12 +39,12 @@ func (postRepo) FindAll() ([]model.Post, error) {
 }
 
 func (postRepo) FindByID(id int) ([]model.Post, error) {
-	post := model.Post{}
-	result := db.Preload("Playlist.WorkoutProfile.WorkoutMusictype.MusicType").Where("uid = ?", id).Find(&post)
+	posts := []model.Post{}
+	result := db.Preload("Playlist.WorkoutProfile.WorkoutMusictype.MusicType").Where("uid = ?", id).Find(&posts)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return &post, nil
+	return posts, nil
 }
 
 func (postRepo) AddPost(post model.Post) int64 {
