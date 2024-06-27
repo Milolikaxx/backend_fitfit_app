@@ -15,7 +15,7 @@ var postRepo = repository.NewPostRepository()
 
 type PostService interface {
 	GetAllPosts() ([]model.Post, error)
-	GetPostByID(key int) (*model.Post, error)
+	GetPostByID(key int) ([]model.Post, error)
 	Save(model.Post) int64
 	Update(wp model.Post, id int) int64
 	Delete(id int) (int64, error)
@@ -29,7 +29,7 @@ func (postServ) GetAllPosts() ([]model.Post, error) {
 	return posts, nil
 }
 
-func (postServ) GetPostByID(id int) (*model.Post, error) {
+func (postServ) GetPostByID(id int) ([]model.Post, error) {
 	post, err := postRepo.FindByID(id)
 	if err != nil {
 		return nil, err
