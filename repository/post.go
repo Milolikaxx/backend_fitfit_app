@@ -21,7 +21,7 @@ func NewPostRepository() postRepository {
 
 type postRepository interface {
 	FindAll() ([]model.Post, error)
-	FindByID(key int) (*model.Post, error)
+	FindByID(key int) ([]model.Post, error)
 	AddPost(model.Post) int64
 	UpdatePost(wp model.Post, id int) int64
 	DeletePost(id int) (int, error)
@@ -38,7 +38,7 @@ func (postRepo) FindAll() ([]model.Post, error) {
 	return posts, nil
 }
 
-func (postRepo) FindByID(id int) (*model.Post, error) {
+func (postRepo) FindByID(id int) ([]model.Post, error) {
 	post := model.Post{}
 	result := db.Preload("Playlist.WorkoutProfile.WorkoutMusictype.MusicType").Where("uid = ?", id).Find(&post)
 	if result.Error != nil {
