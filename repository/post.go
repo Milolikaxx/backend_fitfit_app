@@ -40,7 +40,7 @@ func (postRepo) FindAll() ([]model.Post, error) {
 
 func (postRepo) FindByID(id int) ([]model.Post, error) {
 	posts := []model.Post{}
-	result := db.Preload("Playlist.WorkoutProfile.WorkoutMusictype.MusicType").Where("uid = ?", id).Order("created_at DESC")..Find(&posts)
+	result := db.Preload("Playlist.WorkoutProfile.WorkoutMusictype.MusicType").Where("uid = ?", id).Order("created_at DESC").Find(&posts)
 	if result.Error != nil {
 		return nil, result.Error
 	}
