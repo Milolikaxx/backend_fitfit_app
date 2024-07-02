@@ -27,6 +27,7 @@ type wpRepository interface {
 	AddWorkProfile(model.WorkoutProfile) int64
 	DeleteProfile(id int) (int, error)
 	UpdateWorkProfile(wp model.WorkoutProfile, id int) int64
+	FindByWord(key string) ([]model.WorkoutProfile, error)
 }
 
 func (u wpRepo) FindAll() ([]model.WorkoutProfile, error) {
@@ -93,4 +94,13 @@ func (wpRepo) UpdateWorkProfile(wp model.WorkoutProfile, id int) int64 {
 		log.Printf("Update workoutProfile failed\nAffected row : %v", result.RowsAffected)
 	}
 	return result.RowsAffected
+}
+
+func (wpRepo) FindByWord(key string) ([]model.WorkoutProfile, error) {
+	wps := []model.WorkoutProfile{}
+	result := db.Preload("WorkoutMusictype.MusicType").Where("exercise_type like ? ", "%"+key+"%").Find(&wps)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return wps, nil
 }
