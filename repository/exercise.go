@@ -21,7 +21,7 @@ func NewExerciseRepository() exerciseRepository {
 
 type exerciseRepository interface {
 	FindAll() ([]model.Exercise, error)
-	FindByID(key int) (*model.Exercise, error)
+	FindByID(id int) ([]model.Exercise, error)
 	AddExercise(exercise model.Exercise) int64
 }
 
@@ -34,13 +34,13 @@ func (exerciseRepo) FindAll() ([]model.Exercise, error) {
 	return exercise, nil
 }
 
-func (exerciseRepo) FindByID(id int) (*model.Exercise, error) {
-	exercise := model.Exercise{}
-	result := db.Where("eid = ?", id).Find(&exercise)
+func (exerciseRepo) FindByID(id int) ([]model.Exercise, error) {
+	exercise := []model.Exercise{}
+	result := db.Where("uid = ?", id).Find(&exercise)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return &exercise, nil
+	return exercise, nil
 }
 
 func (exerciseRepo) AddExercise(exercise model.Exercise) int64 {

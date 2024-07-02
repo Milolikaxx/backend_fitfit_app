@@ -15,7 +15,7 @@ var exerciseRepo = repository.NewExerciseRepository()
 
 type exerService interface {
 	GetAllExer() ([]model.Exercise, error)
-	GetExerByID(key int) (*model.Exercise, error)
+	GetExerByID(key int) ([]model.Exercise, error)
 	Save(exercise model.Exercise) int64
 }
 
@@ -27,7 +27,7 @@ func (exerServ) GetAllExer() ([]model.Exercise, error) {
 	return exercise, nil
 }
 
-func (exerServ) GetExerByID(id int) (*model.Exercise, error) {
+func (exerServ) GetExerByID(id int) ([]model.Exercise, error) {
 	exercise, err := exerciseRepo.FindByID(id)
 	if err != nil {
 		return nil, err
