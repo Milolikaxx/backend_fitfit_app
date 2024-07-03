@@ -14,6 +14,7 @@ type Playlist struct {
 	CreatedAt        time.Time        `gorm:"column:created_at;default:CURRENT_TIMESTAMP;not null"`
 	UpdatedAt        time.Time        `gorm:"column:updated_at;default:CURRENT_TIMESTAMP;not null"`
 	PlaylistDetail   []PlaylistDetail `gorm:"foreignKey:Pid;references:Pid"`
+	// TotalTime        float64          `json:"TotalTime"`
 }
 
 // JOin

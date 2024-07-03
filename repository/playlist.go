@@ -51,6 +51,21 @@ func (playlistRepo) FindByID(id int) (*model.Playlist, error) {
 	if result.Error != nil {
 		return nil, result.Error
 	}
+	// Calculate total time
+	// log.Println("Calculating total time")
+	// var totalTime float64
+	// err := db.Model(&model.PlaylistDetail{}).
+	// 	Select("COALESCE(SUM(music.duration), 0) as total_time").
+	// 	Joins("JOIN music ON music.mid = playlist_detail.music_id").
+	// 	Where("playlist_detail.pid = ?", id).
+	// 	Scan(&totalTime).Error
+	// if err != nil {
+	// 	log.Println("Error calculating total time:", err)
+	// 	return nil, err
+	// }
+
+	// playlist.TotalTime = totalTime
+	// log.Println("Total time calculated:", totalTime)
 	return &playlist, nil
 }
 
