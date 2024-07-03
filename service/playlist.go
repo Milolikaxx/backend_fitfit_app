@@ -43,6 +43,7 @@ func (playlistServ) GetPlaylistMusicByID(id int) (*model.Playlist, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return playlist, nil
 }
 
