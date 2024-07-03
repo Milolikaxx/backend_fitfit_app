@@ -21,6 +21,7 @@ type WpService interface {
 	Save(model.WorkoutProfile) int64
 	Delete(id int) (int64, error)
 	Update(wp model.WorkoutProfile, id int) int64
+	GetListWpByKey(key string) ([]model.WorkoutProfile, error)
 }
 
 func (wpServ) GetAllWps() ([]model.WorkoutProfile, error) {
@@ -86,4 +87,12 @@ func (wpServ) Update(wp model.WorkoutProfile, id int) int64 {
 	} else {
 		return -1
 	}
+}
+
+func (wpServ) GetListWpByKey(key string) ([]model.WorkoutProfile, error) {
+	wps, err := wpRepo.FindByWord(key)
+	if err != nil {
+		return nil, err
+	}
+	return wps, nil
 }

@@ -20,6 +20,7 @@ func NewWpController(router *gin.Engine) {
 		ping.PUT("/update/:id", UpdateWorkProfile)
 		ping.GET("/user/:id", getListWpByUid)
 		ping.DELETE("/delprofile/:id", DeleteWorkProfile)
+		ping.GET("/find/:key", getListWpBykey)
 	}
 }
 
@@ -35,24 +36,24 @@ func getAllWp(ctx *gin.Context) {
 
 func getWpByWPID(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	user, err := wpServ.GetWpByWpid(id)
+	wp, err := wpServ.GetWpByWpid(id)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"error": err,
 		})
 	}
-	ctx.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, wp)
 }
 
 func getListWpByUid(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	user, err := wpServ.GetListWpByUid(id)
+	wps, err := wpServ.GetListWpByUid(id)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"error": err,
 		})
 	}
-	ctx.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, wps)
 }
 
 //	func getWpByUID(ctx *gin.Context) {
@@ -89,4 +90,15 @@ func UpdateWorkProfile(ctx *gin.Context) {
 	ctx.ShouldBindJSON(&wp)
 	err := wpServ.Update(wp, id)
 	ctx.JSON(http.StatusOK, err)
+}
+
+func getListWpBykey(ctx *gin.Context) {
+	key := ctx.Param("key")
+	wps, err := wpServ.GetListWpByKey(key)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"error": err,
+		})
+	}
+	ctx.JSON(http.StatusOK, wps)
 }

@@ -31,7 +31,7 @@ func (postRepo) FindAll() ([]model.Post, error) {
 	posts := []model.Post{}
 	// result := db.Joins("User").
 	// 	Find(&posts)
-	result := db.Joins("User").Preload("Playlist.WorkoutProfile.WorkoutMusictype.MusicType").Order("p_datetime ASC").Find(&posts)
+	result := db.Joins("User").Preload("Playlist.WorkoutProfile.WorkoutMusictype.MusicType").Order("p_datetime DESC").Find(&posts)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -40,7 +40,7 @@ func (postRepo) FindAll() ([]model.Post, error) {
 
 func (postRepo) FindByID(id int) ([]model.Post, error) {
 	posts := []model.Post{}
-	result := db.Preload("Playlist.WorkoutProfile.WorkoutMusictype.MusicType").Where("uid = ?", id).Order("p_datetime ASC").Find(&posts)
+	result := db.Preload("Playlist.WorkoutProfile.WorkoutMusictype.MusicType").Where("uid = ?", id).Order("created_at ASC").Find(&posts)
 	if result.Error != nil {
 		return nil, result.Error
 	}
