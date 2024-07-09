@@ -85,7 +85,7 @@ func UpdateUser(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	user := model.User{}
 	ctx.ShouldBindJSON(&user)
-	err := userServ.Update(user, id)
+	err, _ := userServ.Update(user, id)
 	ctx.JSON(http.StatusOK, err)
 }
 

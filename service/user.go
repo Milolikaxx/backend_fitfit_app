@@ -24,7 +24,7 @@ type UserService interface {
 	GetUserByEmail(key string) (*model.User, error)
 	GetUserByName(key string) (*model.User, error)
 	LoginGoogle(user model.User) *model.User
-	Update(model.User, int) int64
+	Update(model.User, int) (*model.User, int64)
 	UpdateUserPassword(model.RePassword, int) int64
 }
 
@@ -115,14 +115,16 @@ func (userServ) Register(user model.User) int64 {
 	}
 }
 
-func (userServ) Update(user model.User, id int) int64 {
+func (userServ) Update(user model.User, id int) (*model.User, int64) {
 	rowsAff := userRepo.UpdateUser(user, id)
 	if rowsAff > 0 {
-		return 1
+		user, _ := userRepo.FindByID(id)
+		return user, 1
+
 	} else if rowsAff == 0 {
-		return 0
+		return nil, 0
 	} else {
-		return -1
+		return nil, -1
 	}
 }
 
