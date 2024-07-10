@@ -14,8 +14,14 @@ type Playlist struct {
 	CreatedAt        time.Time        `gorm:"column:created_at;default:CURRENT_TIMESTAMP;not null"`
 	UpdatedAt        time.Time        `gorm:"column:updated_at;default:CURRENT_TIMESTAMP;not null"`
 	PlaylistDetail   []PlaylistDetail `gorm:"foreignKey:Pid;references:Pid"`
-	// TotalTime        float64          `json:"TotalTime"`
+	TotalDuration    float64          `gorm:"-"`
 }
+
+func (m *Playlist) TableName() string {
+	return "playlist"
+}
+
+// TotalTime        float64          `json:"TotalTime"`
 
 // JOin
 // type Playlist struct {
@@ -40,7 +46,3 @@ type Playlist struct {
 // 	UpdatedAt        time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP;NOT NULL"`
 // 	Musics           []Music   `gorm:"many2many:playlist_detail;foreignKey:Pid;joinForeignKey:Pid;References:Mid;joinReferences:Mid"`
 // }
-
-func (m *Playlist) TableName() string {
-	return "playlist"
-}

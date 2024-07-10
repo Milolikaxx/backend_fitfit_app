@@ -45,29 +45,39 @@ func (playlistRepo) FindAllByWpid(id int) ([]model.Playlist, error) {
 	}
 	return playlist, nil
 }
+
 func (playlistRepo) FindByID(id int) (*model.Playlist, error) {
 	playlist := model.Playlist{}
 	result := db.Preload("PlaylistDetail.Music.MusicType").Where("pid = ?", id).Find(&playlist)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	// Calculate total time
-	// log.Println("Calculating total time")
-	// var totalTime float64
-	// err := db.Model(&model.PlaylistDetail{}).
-	// 	Select("COALESCE(SUM(music.duration), 0) as total_time").
-	// 	Joins("JOIN music ON music.mid = playlist_detail.music_id").
-	// 	Where("playlist_detail.pid = ?", id).
-	// 	Scan(&totalTime).Error
-	// if err != nil {
-	// 	log.Println("Error calculating total time:", err)
-	// 	return nil, err
-	// }
 
-	// playlist.TotalTime = totalTime
-	// log.Println("Total time calculated:", totalTime)
+	// Calculate total duration
+	var totalDuration float64
+	for _, detail := range playlist.PlaylistDetail {
+		totalDuration += detail.Music.Duration
+	}
+	playlist.TotalDuration = totalDuration
+
 	return &playlist, nil
 }
+
+// Calculate total time
+// log.Println("Calculating total time")
+// var totalTime float64
+// err := db.Model(&model.PlaylistDetail{}).
+// 	Select("COALESCE(SUM(music.duration), 0) as total_time").
+// 	Joins("JOIN music ON music.mid = playlist_detail.music_id").
+// 	Where("playlist_detail.pid = ?", id).
+// 	Scan(&totalTime).Error
+// if err != nil {
+// 	log.Println("Error calculating total time:", err)
+// 	return nil, err
+// }
+
+// playlist.TotalTime = totalTime
+// log.Println("Total time calculated:", totalTime)
 
 func (playlistRepo) FindWithoutMusicByID(id int) (*model.Playlist, error) {
 	playlist := model.Playlist{}
