@@ -26,13 +26,22 @@ type wpMusicTypeRepository interface {
 }
 
 func (wpmusicTypeRepo) FindByWPID(id int) ([]model.WorkoutMusictype, error) {
-	wpMusicType := []model.WorkoutMusictype{}
-	result := db.Where("wpid = ?", id).Find(&wpMusicType)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return wpMusicType, nil
+    wpMusicType := []model.WorkoutMusictype{}
+    result := db.Preload("MusicType").Where("wpid = ?", id).Find(&wpMusicType)
+    if result.Error != nil {
+        return nil, result.Error
+    }
+    return wpMusicType, nil
 }
+
+// func (wpmusicTypeRepo) FindByWPID(id int) ([]model.WorkoutMusictype, error) {
+// 	wpMusicType := []model.WorkoutMusictype{}
+// 	result := db.Where("wpid = ?", id).Find(&wpMusicType)
+// 	if result.Error != nil {
+// 		return nil, result.Error
+// 	}
+// 	return wpMusicType, nil
+// }
 
 func (wpmusicTypeRepo) AddWpMusicType(wpmt model.WorkoutMusictype) int64 {
 	result := db.Create(&wpmt)
