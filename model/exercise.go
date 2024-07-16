@@ -75,7 +75,6 @@ func (t MyTime) Value() (driver.Value, error) {
 type Exercise struct {
 	Eid           int          `gorm:"column:eid;type:int(11);primary_key;AUTO_INCREMENT"`
 	Uid           int          `gorm:"column:uid;type:int(11);NOT NULL"`
-	MHistoryid    int          `gorm:"column:m_historyid;type:int(11);NOT NULL"`
 	Edate         time.Time    `gorm:"column:edate;type:date;NOT NULL"`
 	Estart        MyTime       `gorm:"column:estart;type:time;NOT NULL"`
 	Estop         MyTime       `gorm:"column:estop;type:time;NOT NULL"`
@@ -89,3 +88,15 @@ type Exercise struct {
 func (m *Exercise) TableName() string {
 	return "exercise"
 }
+
+// Eid           int          `gorm:"column:eid;type:int(11);primary_key;AUTO_INCREMENT"`
+// Uid           int          `gorm:"column:uid;type:int(11);NOT NULL"`
+// MHistoryid    int          `gorm:"column:m_historyid;type:int(11);NOT NULL"`
+// Edate         time.Time    `gorm:"column:edate;type:date;NOT NULL"`
+// Estart        MyTime       `gorm:"column:estart;type:time;NOT NULL"`
+// Estop         MyTime       `gorm:"column:estop;type:time;NOT NULL"`
+// PlaylistName  string       `gorm:"column:playlist_name;type:varchar(100);NOT NULL"`
+// ExerciseType  ExerciseType `gorm:"column:exercise_type;NOT NULL"`
+// LevelExercise int          `gorm:"column:level_exercise;type:int(11);NOT NULL"`
+// ImagePlaylist string       `gorm:"column:image_playlist;type:varchar(1000);NOT NULL"`
+// Duration      int          `gorm:"column:duration;type:int(11);NOT NULL"`
