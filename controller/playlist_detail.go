@@ -26,6 +26,7 @@ func NewPlaylistDetailController(router *gin.Engine) {
 		ping.DELETE("/delete/:id", DeleteMusic)
 		ping.GET("/musiclist/:id", getMusicList)
 		ping.GET("/rand", randSong1)
+		ping.POST("/update", UpdatePlaylistDe)
 	}
 }
 
@@ -299,4 +300,11 @@ func ReplaceSong(data model.RandMusic) ([]model.Music, error) {
 	log.Printf("music %s , Bpm : %d", newSong.Name, newSong.Bpm)
 	data.MusicList[data.Index] = newSong
 	return data.MusicList, nil
+}
+
+func UpdatePlaylistDe(ctx *gin.Context) {
+	playlistDe := model.PlaylistDetail{}
+	ctx.ShouldBindJSON(&playlistDe)
+	rowsAff := playlistDetailServ.Update(playlistDe)
+	ctx.JSON(http.StatusOK, rowsAff)
 }

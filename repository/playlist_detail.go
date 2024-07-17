@@ -23,6 +23,7 @@ type playlistDetailRepository interface {
 	FindAll() ([]model.PlaylistDetail, error)
 	AddMusicToPlaylist(model.PlaylistDetail) int64
 	DeleteMusicInPlaylist(key int) (int, error)
+	UpdatePlaylistDetail(playlistDe model.PlaylistDetail) int64
 }
 
 func (playlistDetailRepo) FindAll() ([]model.PlaylistDetail, error) {
@@ -51,4 +52,14 @@ func (playlistDetailRepo) DeleteMusicInPlaylist(id int) (int, error) {
 		return int(result.RowsAffected), result.Error
 	}
 	return int(result.RowsAffected), nil
+}
+
+func (playlistDetailRepo) UpdatePlaylistDetail(playlistDe model.PlaylistDetail) int64 {
+	result := db.Model(&model.PlaylistDetail{}).Where("id = ? AND pid = ? ", playlistDe.ID, playlistDe.Pid).Updates(&playlistDe)
+	if result.RowsAffected > 0 {
+		log.Printf("Update PlaylistDetail complete\nAffected row : %v", result.RowsAffected)
+	} else {
+		log.Printf("Update PlaylistDetail failed\nAffected row : %v", result.RowsAffected)
+	}
+	return result.RowsAffected
 }
