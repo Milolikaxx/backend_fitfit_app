@@ -22,6 +22,7 @@ type PlaylistDetailService interface {
 	GetAllPlaylistDetail() ([]model.PlaylistDetail, error)
 	Save(model.PlaylistDetail) int64
 	Delete(key int) (int64, error)
+	Update(playlistDe model.PlaylistDetail) int64
 }
 
 func (playlistDetailServ) GetAllPlaylistDetail() ([]model.PlaylistDetail, error) {
@@ -50,5 +51,16 @@ func (playlistDetailServ) Delete(id int) (int64, error) {
 		return 0, error
 	} else {
 		return -1, error
+	}
+}
+
+func (playlistDetailServ) Update(playlistDe model.PlaylistDetail) int64 {
+	rowsAff := playlistDetailRepo.UpdatePlaylistDetail(playlistDe)
+	if rowsAff > 0 {
+		return 1
+	} else if rowsAff == 0 {
+		return 0
+	} else {
+		return -1
 	}
 }
