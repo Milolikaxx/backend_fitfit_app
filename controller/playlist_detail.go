@@ -26,6 +26,7 @@ func NewPlaylistDetailController(router *gin.Engine) {
 		ping.DELETE("/delete/:id", DeleteMusic)
 		ping.GET("/musiclist/:id", getMusicList)
 		ping.GET("/rand", randSong1)
+		ping.GET("/rand1song", rand1songOfPlaylist)
 		ping.POST("/update", UpdatePlaylistDe)
 	}
 }
@@ -73,12 +74,12 @@ func getMusicList(ctx *gin.Context) {
 var bpm = []int{100, 114, 133, 152, 171, 190}
 
 var levelProceed = [][]int{
-	{100},          //Lv.0
-	{10, 35},       //Lv.1
-	{10, 12, 22},   //Lv.2
-	{5, 5, 10, 25}, //Lv.3
-	// {10, 20, 30, 40},        //Lv.4
-	// {5, 10, 15, 10, 15, 30}, //Lv.5
+	{100},
+	{10, 35},           //Lv1
+	{10, 10, 35},       //Lv2
+	{10, 15, 35},       //Lv3
+	{5, 5, 15, 20, 35}, //Lv4
+	{5, 5, 10, 10, 15, 35},
 }
 
 type MusicGroup struct {
@@ -151,44 +152,6 @@ func CreatePlaylistWP(wpid int) ([]model.Music, error) {
 	fmt.Printf("level4 = %d เพลง\n", len(groupBy(groupMusic, 4)))
 	fmt.Printf("level5 = %d เพลง\n\n", len(groupBy(groupMusic, 5)))
 
-	//Process
-	// var musicList []model.Music
-	// if lvl == 2 {
-	// 	if durationEx == 10 {
-	// 		//ช่วง 1
-	// 		groupedMusic1 := groupBy(groupMusic, 1)
-	// 		length1 := len(groupedMusic1)
-	// 		if length1 == 0 {
-	// 			return musicList, fmt.Errorf("ไม่มีเพลงที่สามารถใช้ได้ในระดับปัจจุบัน")
-	// 		}
-
-	// 		idx1 := rand.Int() % length1
-	// 		m1 := groupBy(groupMusic, 1)[idx1]
-
-	// 		musicList = append(musicList, m1)
-
-	// 		//ช่วง 2
-	// 		groupedMusic2 := groupBy(groupMusic, 2)
-	// 		length2 := len(groupedMusic2)
-	// 		if length2 == 0 {
-	// 			return musicList, fmt.Errorf("ไม่มีเพลงที่สามารถใช้ได้ในระดับปัจจุบัน")
-	// 		}
-
-	// 		idx2 := rand.Int() % length2
-	// 		m2 := groupBy(groupMusic, 2)[idx2]
-	// 		musicList = append(musicList, m2)
-	// 		// ช่วง 3
-	// 		groupedMusic3 := groupBy(groupMusic, 1)
-	// 		length3 := len(groupedMusic3)
-	// 		if length3 == 0 {
-	// 			return musicList, fmt.Errorf("ไม่มีเพลงที่สามารถใช้ได้ในระดับปัจจุบัน")
-	// 		}
-
-	// 		idx3 := rand.Int() % length3
-	// 		m3 := groupBy(groupMusic, 1)[idx3]
-	// 		musicList = append(musicList, m3)
-	// 	}
-	// }
 	//Process 1
 	fmt.Println(levelProceed[lvl])
 	timeRemain := duration                 //เวลาที่ยังเหลือ
@@ -259,6 +222,16 @@ func randSong1(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, music)
 }
 
+func rand1songOfPlaylist(ctx *gin.Context) {
+	rand := model.RandMusicOfPlaylist{}
+	ctx.ShouldBindJSON(&rand)
+	music, err := ReplaceSongOfPlaylistSave(rand)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, music)
+}
 func ReplaceSong(data model.RandMusic) ([]model.Music, error) {
 	//workout_profile
 	var wpRepo = repository.NewWpRepository()
@@ -302,6 +275,48 @@ func ReplaceSong(data model.RandMusic) ([]model.Music, error) {
 	return data.MusicList, nil
 }
 
+func ReplaceSongOfPlaylistSave(data model.RandMusicOfPlaylist) ([]model.PlaylistDetail, error) {
+	//workout_profile
+	var wpRepo = repository.NewWpRepository()
+	wp, _ := wpRepo.FindByWpid(data.Wpid)
+	fmt.Printf("wp:%v  \n\n", wp)
+	//infomation
+	lvl := wp.LevelExercise
+	duration := int(wp.Duration * 60)
+	// durationEx := wp.Duration
+	exeType := wp.ExerciseType
+	var musicType []int
+	for _, t := range wp.WorkoutMusictype {
+		musicType = append(musicType, t.Mtid)
+	}
+	fmt.Printf("infomation  lvl:%d  duration:%d  type:%s  musicType:%v  bpm:%d  \n\n", lvl, duration, exeType, musicType, bpm[lvl])
+
+	// Fetch music
+	//music - level
+	musicRepo := repository.NewMusicRepository()
+	music, _ := musicRepo.FindAllMusicByLevel(bpm[lvl], musicType)
+	fmt.Printf("result music:%d\n\n", len(music))
+
+	// Find a new song
+	originalSong := data.PlaylistDetail[data.Index]
+	minBPM := int(float64(originalSong.Music.Bpm) * 0.95)
+	maxBPM := int(float64(originalSong.Music.Bpm) * 1.05)
+
+	var newSong model.Music
+	for {
+		idx := rand.Intn(len(music))
+		s := music[idx]
+		if s.Bpm >= minBPM && s.Bpm <= maxBPM {
+			newSong = s
+			break
+		}
+	}
+	// Replace the song in the music list of playlistDe
+	log.Printf("music %s (%d) , Bpm : %d", newSong.Name, newSong.Mid, newSong.Bpm)
+	data.PlaylistDetail[data.Index].Music = newSong
+	data.PlaylistDetail[data.Index].Mid = newSong.Mid
+	return data.PlaylistDetail, nil
+}
 func UpdatePlaylistDe(ctx *gin.Context) {
 	playlistDe := model.PlaylistDetail{}
 	ctx.ShouldBindJSON(&playlistDe)
