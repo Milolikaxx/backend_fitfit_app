@@ -15,7 +15,7 @@ func NewMusicController(router *gin.Engine) {
 	{
 		ping.GET(":id", getMusicByWtid)
 		ping.GET("/random/:id", getRandomMusicByWtid)
-		ping.GET("/findByWp/", getMusicList)
+		ping.GET("/findByWp", getMusicList)
 	}
 }
 
