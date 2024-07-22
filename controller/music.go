@@ -1,7 +1,10 @@
 package controller
 
 import (
+	"backend_fitfit_app/model"
+	"backend_fitfit_app/repository"
 	"backend_fitfit_app/service"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -14,8 +17,7 @@ func NewMusicController(router *gin.Engine) {
 	ping := router.Group("/music")
 	{
 		ping.GET(":id", getMusicByWtid)
-		ping.GET("/random/:id", getRandomMusicByWtid)
-		ping.GET("/findByWp/:id", getMusicList)
+		ping.GET("/findbywp/:id", getMusic)
 	}
 }
 
@@ -28,19 +30,8 @@ func getMusicByWtid(ctx *gin.Context) {
 		})
 	}
 	ctx.JSON(http.StatusOK, music)
-	// mtid := []model.MusictypeId{}
-	// ctx.ShouldBindJSON(&mtid)
-	// for _, id := range mtid {
-	// 	music, err := musicServ.GetMusicByMtid(id)
-	// 	if err != nil {
-	// 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	// 		return
-	// 	}
-	// 	ctx.JSON(http.StatusOK, music)
-	// }
-
 }
-func getMusicList(ctx *gin.Context) {
+func getMusic(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	music, err := musicPlaylistWP(id)
 	if err != nil {
@@ -50,7 +41,9 @@ func getMusicList(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, music)
 
 }
-var bpm = []int{100, 114, 133, 152, 171, 190}
+
+var Bpm = []int{100, 114, 133, 152, 171, 190}
+
 func musicPlaylistWP(wpid int) ([]model.Music, error) {
 	//workout_profile
 	var wpRepo = repository.NewWpRepository()
@@ -67,7 +60,7 @@ func musicPlaylistWP(wpid int) ([]model.Music, error) {
 	}
 	fmt.Printf("infomation  lvl:%d  duration:%d  type:%s  musicType:%v  bpm:%d  \n\n", lvl, duration, exeType, musicType, bpm[lvl])
 
-	music, _ := musicServ.GetMusicByLevel(bpm[lvl], musicType)
+	music, _ := musicServ.GetMusicByLevel(Bpm[lvl], musicType)
 	fmt.Printf("result music:%d\n\n", len(music))
 	return music, nil
 }
