@@ -15,7 +15,7 @@ var musicRepo = repository.NewMusicRepository()
 
 type MusicService interface {
 	GetMusicByMtid(key int) ([]model.Music, error)
-	GetRandomMusicByMtid(id int) (*model.Music, error)
+	GetMusicByLevel(bpm int, musicType []int) ([]model.Music, error)
 }
 
 func (musicServ) GetMusicByMtid(musicType int) ([]model.Music, error) {
@@ -26,8 +26,8 @@ func (musicServ) GetMusicByMtid(musicType int) ([]model.Music, error) {
 	return music, nil
 }
 
-func (musicServ) GetRandomMusicByMtid(id int) (*model.Music, error) {
-	music, err := musicRepo.RandomMusicByMusictype(id)
+func (musicServ) GetMusicByLevel(bpm int, musicType []int) ([]model.Music, error) {
+	music, err := musicRepo.FindAllMusicByLevel(bpm,musicType)
 	if err != nil {
 		return nil, err
 	}

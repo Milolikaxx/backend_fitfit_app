@@ -15,6 +15,7 @@ func NewMusicController(router *gin.Engine) {
 	{
 		ping.GET(":id", getMusicByWtid)
 		ping.GET("/random/:id", getRandomMusicByWtid)
+		ping.GET("/findByWp/", getMusicList)
 	}
 }
 
@@ -39,14 +40,34 @@ func getMusicByWtid(ctx *gin.Context) {
 	// }
 
 }
-
-func getRandomMusicByWtid(ctx *gin.Context) {
+func getMusicList(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	music, err := musicServ.GetRandomMusicByMtid(id)
+	music, err := musicPlaylistWP(id)
 	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"error": err,
-		})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	ctx.JSON(http.StatusOK, music)
+
+}
+var bpm = []int{100, 114, 133, 152, 171, 190}
+func musicPlaylistWP(wpid int) ([]model.Music, error) {
+	//workout_profile
+	var wpRepo = repository.NewWpRepository()
+	wp, _ := wpRepo.FindByWpid(wpid)
+	fmt.Printf("wp:%v  \n\n", wp)
+	//infomation
+	lvl := wp.LevelExercise
+	duration := int(wp.Duration * 60)
+	// durationEx := wp.Duration
+	exeType := wp.ExerciseType
+	var musicType []int
+	for _, t := range wp.WorkoutMusictype {
+		musicType = append(musicType, t.Mtid)
+	}
+	fmt.Printf("infomation  lvl:%d  duration:%d  type:%s  musicType:%v  bpm:%d  \n\n", lvl, duration, exeType, musicType, bpm[lvl])
+
+	music, _ := musicServ.GetMusicByLevel(bpm[lvl], musicType)
+	fmt.Printf("result music:%d\n\n", len(music))
+	return music, nil
 }
