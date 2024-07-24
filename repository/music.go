@@ -2,6 +2,7 @@ package repository
 
 import (
 	"backend_fitfit_app/model"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -21,6 +22,7 @@ func NewMusicRepository() musicRepository {
 type musicRepository interface {
 	FindAllMusicByMusictype(musicType int) ([]model.Music, error)
 	FindAllMusicByLevel(bpm int, musicType []int) ([]model.Music, error)
+	SearchMusic(searchMusic model.SearchMusic) ([]model.Music, error)
 }
 
 func (musicRepo) FindAllMusicByMusictype(musicType int) ([]model.Music, error) {
@@ -32,7 +34,6 @@ func (musicRepo) FindAllMusicByMusictype(musicType int) ([]model.Music, error) {
 	return music, nil
 }
 
-
 func (musicRepo) FindAllMusicByLevel(bpm int, musicType []int) ([]model.Music, error) {
 	music := []model.Music{}
 	result := db.Joins("MusicType").Where("music.bpm <= ?", bpm).Where("music.mtid in (?)", musicType).Find(&music)
@@ -40,4 +41,18 @@ func (musicRepo) FindAllMusicByLevel(bpm int, musicType []int) ([]model.Music, e
 		return nil, result.Error
 	}
 	return music, nil
+}
+
+func (musicRepo) SearchMusic(searchMusic model.SearchMusic) ([]model.Music, error) {
+	var results []model.Music
+	searchMusic.Key = strings.ToLower(searchMusic.Key)
+
+	for _, song := range searchMusic.Music {
+		if strings.Contains(strings.ToLower(song.Name), searchMusic.Key) ||
+			strings.Contains(strings.ToLower(song.MusicType.Name), searchMusic.Key) ||
+			strings.Contains(strings.ToLower(song.Artist), searchMusic.Key) {
+			results = append(results, song)
+		}
+	}
+	return results, nil
 }
