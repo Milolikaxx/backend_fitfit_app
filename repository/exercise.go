@@ -23,6 +23,7 @@ type exerciseRepository interface {
 	FindAll() ([]model.Exercise, error)
 	FindByID(id int) ([]model.Exercise, error)
 	AddExercise(exercise model.Exercise) int64
+	UpdateExercise(exercise model.Exercise, id int) int64
 }
 
 func (exerciseRepo) FindAll() ([]model.Exercise, error) {
@@ -52,4 +53,14 @@ func (exerciseRepo) AddExercise(exercise model.Exercise) int64 {
 		log.Printf("Add Exercise failed %v", result.RowsAffected)
 		return 0
 	}
+}
+
+func (exerciseRepo) UpdateExercise(exercise model.Exercise, id int) int64 {
+	result := db.Model(&model.Exercise{}).Where("eid = ?", id).Updates(&exercise)
+	if result.RowsAffected > 0 {
+		log.Printf("Update Exercise History complete\nAffected row : %v", result.RowsAffected)
+	} else {
+		log.Printf("Update Exercise History failed\nAffected row : %v", result.RowsAffected)
+	}
+	return result.RowsAffected
 }

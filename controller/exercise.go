@@ -17,6 +17,7 @@ func NewExerciseController(router *gin.Engine) {
 		ping.GET("", getAllExer)
 		ping.GET(":id", getExerByID)
 		ping.POST("/addexercise", SaveExercise)
+		ping.PUT("/edithistory/:id", UpdateExerciseHis)
 	}
 }
 
@@ -46,4 +47,12 @@ func SaveExercise(ctx *gin.Context) {
 	ctx.ShouldBindJSON(&history)
 	err := exerServ.Save(history)
 	ctx.JSON(http.StatusCreated, err)
+}
+
+func UpdateExerciseHis(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	exercise := model.Exercise{}
+	ctx.ShouldBindJSON(&exercise)
+	err, _ := exerServ.Update(exercise, id)
+	ctx.JSON(http.StatusOK, err)
 }

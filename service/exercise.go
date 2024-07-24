@@ -17,6 +17,7 @@ type exerService interface {
 	GetAllExer() ([]model.Exercise, error)
 	GetExerByID(key int) ([]model.Exercise, error)
 	Save(exercise model.Exercise) int64
+	Update(exercise model.Exercise, id int) ([]model.Exercise, int64)
 }
 
 func (exerServ) GetAllExer() ([]model.Exercise, error) {
@@ -43,5 +44,18 @@ func (exerServ) Save(exercise model.Exercise) int64 {
 		return 0
 	} else {
 		return -1
+	}
+}
+
+func (exerServ) Update(exercise model.Exercise, id int) ([]model.Exercise, int64) {
+	rowsAff := exerciseRepo.UpdateExercise(exercise, id)
+	if rowsAff > 0 {
+		exercise, _ := exerciseRepo.FindByID(id)
+		return exercise, 1
+
+	} else if rowsAff == 0 {
+		return nil, 0
+	} else {
+		return nil, -1
 	}
 }
