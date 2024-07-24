@@ -18,6 +18,7 @@ func NewMusicController(router *gin.Engine) {
 	{
 		ping.GET(":id", getMusicByWtid)
 		ping.GET("/findbywp/:id", getMusic)
+		ping.GET("/search", getSearchMusic)
 	}
 }
 
@@ -40,6 +41,16 @@ func getMusic(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, music)
 
+}
+func getSearchMusic(ctx *gin.Context) {
+	musicKey := model.SearchMusic{}
+	ctx.ShouldBindJSON(&musicKey)
+	music, err := musicServ.SearchMusic(musicKey)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusCreated, music)
 }
 
 var Bpm = []int{100, 114, 133, 152, 171, 190}
