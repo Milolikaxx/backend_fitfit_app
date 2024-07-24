@@ -17,5 +17,6 @@ func StartServer() {
 	controller.NewPlaylistDetailController(router)
 	controller.NewMusicController(router)
 	controller.NewExerciseController(router)
+	controller.NewMusicHistoryController(router)
 	router.Run()
 }
