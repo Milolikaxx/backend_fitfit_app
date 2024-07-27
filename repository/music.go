@@ -54,5 +54,9 @@ func (musicRepo) SearchMusic(searchMusic model.SearchMusic) ([]model.Music, erro
 			results = append(results, song)
 		}
 	}
+
+	if len(results) == 0 {
+		return []model.Music{}, nil
+	}
 	return results, nil
 }
