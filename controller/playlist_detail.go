@@ -317,6 +317,30 @@ func ReplaceSongOfPlaylistSave(data model.RandMusicOfPlaylist) ([]model.Playlist
 	data.PlaylistDetail[data.Index].Mid = newSong.Mid
 	return data.PlaylistDetail, nil
 }
+func delSong(ctx *gin.Context) {
+	delSong := model.RandMusic{}
+	ctx.ShouldBindJSON(&delSong)
+	music, err := delSong(rand)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, music)
+}
+func delSong(data model.RandMusic) ([]model.Music, error) {
+	 if data.Index < 0 || data.Index >= len(data.MusicList) {
+        return nil, fmt.Errorf("index %d out of range", idx)
+    }
+    newList := make([]model.Music, 0, len(data.MusicList)-1)
+    for i, song := range data.MusicList {
+        if i != idx {
+            newList = append(newList, song)
+        }
+    }
+    data.MusicList = newList
+    return data.MusicList, nil
+}
+
 func UpdatePlaylistDe(ctx *gin.Context) {
 	playlistDe := model.PlaylistDetail{}
 	ctx.ShouldBindJSON(&playlistDe)
