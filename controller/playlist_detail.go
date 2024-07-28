@@ -26,8 +26,9 @@ func NewPlaylistDetailController(router *gin.Engine) {
 		ping.DELETE("/delete/:id", DeleteMusic)
 		ping.GET("/musiclist/:id", getMusicList)
 		ping.GET("/rand", randSong1)
-		ping.GET("/del", delSongNusicList)
+		ping.GET("/del", delSongMusicList)
 		ping.GET("/rand1song", rand1songOfPlaylist)
+		ping.GET("/delPlaylistDetail", delSongPlaylist)
 		ping.POST("/update", UpdatePlaylistDe)
 	}
 }
@@ -318,7 +319,8 @@ func ReplaceSongOfPlaylistSave(data model.RandMusicOfPlaylist) ([]model.Playlist
 	data.PlaylistDetail[data.Index].Mid = newSong.Mid
 	return data.PlaylistDetail, nil
 }
-func delSongNusicList(ctx *gin.Context) {
+
+func delSongMusicList(ctx *gin.Context) {
 	data := model.RandMusic{}
 	ctx.ShouldBindJSON(&data)
 	music, err := delSong(data)
@@ -328,6 +330,7 @@ func delSongNusicList(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, music)
 }
+
 func delSong(data model.RandMusic) ([]model.Music, error) {
 	if data.Index < 0 || data.Index >= len(data.MusicList) {
 		return nil, fmt.Errorf("index %d out of range", data.Index)
@@ -340,6 +343,31 @@ func delSong(data model.RandMusic) ([]model.Music, error) {
 	}
 	data.MusicList = newList
 	return data.MusicList, nil
+}
+
+func delSongPlaylist(ctx *gin.Context) {
+	data := model.RandMusicOfPlaylist{}
+	ctx.ShouldBindJSON(&data)
+	music, err := deleteSongOfPlaylist(data)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, music)
+}
+
+func deleteSongOfPlaylist(data model.RandMusicOfPlaylist) ([]model.PlaylistDetail, error) {
+	if data.Index < 0 || data.Index >= len(data.PlaylistDetail) {
+		return nil, fmt.Errorf("index %d out of range", data.Index)
+	}
+	newList := make([]model.PlaylistDetail, 0, len(data.PlaylistDetail)-1)
+	for i, song := range data.PlaylistDetail {
+		if i != data.Index {
+			newList = append(newList, song)
+		}
+	}
+	data.PlaylistDetail = newList
+	return data.PlaylistDetail, nil
 }
 
 func UpdatePlaylistDe(ctx *gin.Context) {
