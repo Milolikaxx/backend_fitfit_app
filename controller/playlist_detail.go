@@ -26,6 +26,7 @@ func NewPlaylistDetailController(router *gin.Engine) {
 		ping.DELETE("/delete/:id", DeleteMusic)
 		ping.GET("/musiclist/:id", getMusicList)
 		ping.GET("/rand", randSong1)
+		ping.GET("/del", delSong)
 		ping.GET("/rand1song", rand1songOfPlaylist)
 		ping.POST("/update", UpdatePlaylistDe)
 	}
