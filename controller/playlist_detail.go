@@ -26,7 +26,7 @@ func NewPlaylistDetailController(router *gin.Engine) {
 		ping.DELETE("/delete/:id", DeleteMusic)
 		ping.GET("/musiclist/:id", getMusicList)
 		ping.GET("/rand", randSong1)
-		ping.GET("/del", delSong)
+		ping.GET("/del", delSongNusicList)
 		ping.GET("/rand1song", rand1songOfPlaylist)
 		ping.POST("/update", UpdatePlaylistDe)
 	}
@@ -78,7 +78,7 @@ var levelProceed = [][]int{
 	{100},
 	{10, 35},           //Lv1
 	{10, 10, 35},       //Lv2
-	{5, 5, 10, 35},       //Lv3
+	{5, 5, 10, 35},     //Lv3
 	{5, 5, 15, 20, 35}, //Lv4
 	{5, 5, 10, 10, 15, 35},
 }
@@ -318,10 +318,10 @@ func ReplaceSongOfPlaylistSave(data model.RandMusicOfPlaylist) ([]model.Playlist
 	data.PlaylistDetail[data.Index].Mid = newSong.Mid
 	return data.PlaylistDetail, nil
 }
-func delSong(ctx *gin.Context) {
-	delSong := model.RandMusic{}
-	ctx.ShouldBindJSON(&delSong)
-	music, err := delSong(rand)
+func delSongNusicList(ctx *gin.Context) {
+	data := model.RandMusic{}
+	ctx.ShouldBindJSON(&data)
+	music, err := delSong(data)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -329,17 +329,17 @@ func delSong(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, music)
 }
 func delSong(data model.RandMusic) ([]model.Music, error) {
-	 if data.Index < 0 || data.Index >= len(data.MusicList) {
-        return nil, fmt.Errorf("index %d out of range", idx)
-    }
-    newList := make([]model.Music, 0, len(data.MusicList)-1)
-    for i, song := range data.MusicList {
-        if i != idx {
-            newList = append(newList, song)
-        }
-    }
-    data.MusicList = newList
-    return data.MusicList, nil
+	if data.Index < 0 || data.Index >= len(data.MusicList) {
+		return nil, fmt.Errorf("index %d out of range", data.Index)
+	}
+	newList := make([]model.Music, 0, len(data.MusicList)-1)
+	for i, song := range data.MusicList {
+		if i != data.Index {
+			newList = append(newList, song)
+		}
+	}
+	data.MusicList = newList
+	return data.MusicList, nil
 }
 
 func UpdatePlaylistDe(ctx *gin.Context) {
