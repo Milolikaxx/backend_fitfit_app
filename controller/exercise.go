@@ -18,6 +18,7 @@ func NewExerciseController(router *gin.Engine) {
 		ping.GET(":id", getExerByID)
 		ping.POST("/addexercise", SaveExercise)
 		ping.PUT("/edithistory/:id", UpdateExerciseHis)
+		ping.GET("/searchbyday", FindByDay)
 	}
 }
 
@@ -55,4 +56,27 @@ func UpdateExerciseHis(ctx *gin.Context) {
 	ctx.ShouldBindJSON(&exercise)
 	err, _ := exerServ.Update(exercise, id)
 	ctx.JSON(http.StatusOK, err)
+}
+
+func FindByDay(ctx *gin.Context) {
+	// สร้างตัวแปรเพื่อเก็บข้อมูลที่รับเข้ามา
+	var requestData struct {
+		Keyword string `json:"keyword"`
+	}
+
+	// ดึงข้อมูล JSON จาก request body และแปลงเป็น struct
+	if err := ctx.ShouldBindJSON(&requestData); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// เรียกใช้งาน service เพื่อค้นหาข้อมูล
+	exercises, err := exerServ.SearchByDay(requestData.Keyword)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// ส่งข้อมูลกลับในรูป JSON
+	ctx.JSON(http.StatusOK, exercises)
 }

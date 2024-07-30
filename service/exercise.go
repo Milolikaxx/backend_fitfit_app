@@ -18,6 +18,7 @@ type exerService interface {
 	GetExerByID(key int) ([]model.Exercise, error)
 	Save(exercise model.Exercise) int64
 	Update(exercise model.Exercise, id int) ([]model.Exercise, int64)
+	SearchByDay(keyword string) ([]model.Exercise, error)
 }
 
 func (exerServ) GetAllExer() ([]model.Exercise, error) {
@@ -58,4 +59,12 @@ func (exerServ) Update(exercise model.Exercise, id int) ([]model.Exercise, int64
 	} else {
 		return nil, -1
 	}
+}
+
+func (exerServ) SearchByDay(keyword string) ([]model.Exercise, error) {
+	exercise, err := exerciseRepo.FindExerciseByDay(keyword)
+	if err != nil {
+		return nil, err
+	}
+	return exercise, nil
 }

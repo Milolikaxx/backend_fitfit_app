@@ -24,6 +24,7 @@ type exerciseRepository interface {
 	FindByID(id int) ([]model.Exercise, error)
 	AddExercise(exercise model.Exercise) int64
 	UpdateExercise(exercise model.Exercise, id int) int64
+	FindExerciseByDay(keyword string) ([]model.Exercise, error)
 }
 
 func (exerciseRepo) FindAll() ([]model.Exercise, error) {
@@ -63,4 +64,13 @@ func (exerciseRepo) UpdateExercise(exercise model.Exercise, id int) int64 {
 		log.Printf("Update Exercise History failed\nAffected row : %v", result.RowsAffected)
 	}
 	return result.RowsAffected
+}
+
+func (exerciseRepo) FindExerciseByDay(keyword string) ([]model.Exercise, error) {
+	exercise := []model.Exercise{}
+	result := db.Where("DATE(edate) = ?", keyword).Find(&exercise)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return exercise, nil
 }
