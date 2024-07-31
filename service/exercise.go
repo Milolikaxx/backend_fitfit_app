@@ -21,7 +21,7 @@ type exerService interface {
 	Update(exercise model.Exercise, id int) ([]model.Exercise, int64)
 	SearchByDay(keyword string) ([]model.Exercise, error)
 	// ExerciseLast7Day() ([]model.Exercise, error)
-	ExerciseLast7Day() (map[string]interface{}, error)
+	ExerciseLast7Day() ([]Day, error)
 }
 
 func (exerServ) GetAllExer() ([]model.Exercise, error) {
@@ -80,29 +80,40 @@ func (exerServ) SearchByDay(keyword string) ([]model.Exercise, error) {
 // 	return exercise, nil
 // }
 
-func (exerServ) ExerciseLast7Day() (map[string]interface{}, error) {
+type Day struct {
+	Date      string           `json:"date"`
+	Exercises []model.Exercise `json:"exercises"`
+	Count     int              `json:"count"`
+}
+
+func (exerServ) ExerciseLast7Day() ([]Day, error) {
 	exercises, err := exerciseRepo.FindExerciseLast7Days()
 	if err != nil {
 		return nil, err
 	}
 
-	// Initialize the result map with keys for the last 7 days
-	result := make(map[string]interface{})
+	// Initialize the result slice with 7 Day structs for the last 7 days
+	var result []Day
 	for i := 0; i < 7; i++ {
 		day := time.Now().AddDate(0, 0, -i).Format("2006-01-02")
-		result[day] = map[string]interface{}{
-			"exercises": []model.Exercise{},
-			"count":     0,
-		}
+		result = append(result, Day{
+			Date:      day,
+			Exercises: []model.Exercise{},
+			Count:     0,
+		})
 	}
 
 	// Group exercises by date and count them
 	for _, exercise := range exercises {
 		day := exercise.Edate.Format("2006-01-02")
-		dayData := result[day].(map[string]interface{})
-		dayData["exercises"] = append(dayData["exercises"].([]model.Exercise), exercise)
-		dayData["count"] = dayData["count"].(int) + 1
+		for i := range result {
+			if result[i].Date == day {
+				result[i].Exercises = append(result[i].Exercises, exercise)
+				result[i].Count++
+			}
+		}
 	}
 
 	return result, nil
 }
+

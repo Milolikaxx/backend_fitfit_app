@@ -92,6 +92,17 @@ func FindByDay(ctx *gin.Context) {
 // 	ctx.JSON(http.StatusOK, exers)
 // }
 
+// func GetLast7Day(ctx *gin.Context) {
+// 	exers, err := exerServ.ExerciseLast7Day()
+// 	if err != nil {
+// 		ctx.JSON(http.StatusOK, gin.H{
+// 			"error": err,
+// 		})
+// 		return
+// 	}
+// 	ctx.JSON(http.StatusOK, exers)
+// }
+
 func GetLast7Day(ctx *gin.Context) {
 	exers, err := exerServ.ExerciseLast7Day()
 	if err != nil {
