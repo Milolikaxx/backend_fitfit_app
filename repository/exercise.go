@@ -25,6 +25,7 @@ type exerciseRepository interface {
 	AddExercise(exercise model.Exercise) int64
 	UpdateExercise(exercise model.Exercise, id int) int64
 	FindExerciseByDay(keyword string) ([]model.Exercise, error)
+	FindExerciseLast7Days() ([]model.Exercise, error)
 }
 
 func (exerciseRepo) FindAll() ([]model.Exercise, error) {
@@ -74,3 +75,13 @@ func (exerciseRepo) FindExerciseByDay(keyword string) ([]model.Exercise, error) 
 	}
 	return exercise, nil
 }
+
+func (exerciseRepo) FindExerciseLast7Days() ([]model.Exercise, error) {
+	exercise := []model.Exercise{}
+	result := db.Where("edate >= NOW() - INTERVAL 7 DAY").Find(&exercise)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return exercise, nil
+}
+

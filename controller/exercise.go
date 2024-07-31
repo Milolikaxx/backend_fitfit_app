@@ -19,6 +19,7 @@ func NewExerciseController(router *gin.Engine) {
 		ping.POST("/addexercise", SaveExercise)
 		ping.PUT("/edithistory/:id", UpdateExerciseHis)
 		ping.GET("/searchbyday", FindByDay)
+		ping.GET("/last7day", GetLast7Day)
 	}
 }
 
@@ -79,4 +80,25 @@ func FindByDay(ctx *gin.Context) {
 
 	// ส่งข้อมูลกลับในรูป JSON
 	ctx.JSON(http.StatusOK, exercises)
+}
+
+// func GetLast7Day(ctx *gin.Context) {
+// 	exers, err := exerServ.ExerciseLast7Day()
+// 	if err != nil {
+// 		ctx.JSON(http.StatusOK, gin.H{
+// 			"error": err,
+// 		})
+// 	}
+// 	ctx.JSON(http.StatusOK, exers)
+// }
+
+func GetLast7Day(ctx *gin.Context) {
+	exers, err := exerServ.ExerciseLast7Day()
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"error": err,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, exers)
 }
