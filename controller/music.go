@@ -20,6 +20,7 @@ func NewMusicController(router *gin.Engine) {
 		ping.GET("/findbywp/:id", getMusic)
 		ping.GET("/search", getSearchMusic)
 		ping.GET("/findmusicaddsong", findMusicForAddSongPL)
+		ping.GET("/findmusicaddsong/musiclist", findMusicForAddSongMusicList)
 	}
 }
 
@@ -113,6 +114,54 @@ func findMusicForAddSongOfPlaylist(data model.RandMusicOfPlaylist) ([]model.Musi
 	originalSong := data.PlaylistDetail[data.Index]
 	minBPM := int(float64(originalSong.Music.Bpm) * 0.95)
 	maxBPM := int(float64(originalSong.Music.Bpm) * 1.05)
+
+	var filteredMusic []model.Music
+	for _, m := range music {
+		if m.Bpm >= minBPM && m.Bpm <= maxBPM {
+			filteredMusic = append(filteredMusic, m)
+		}
+	}
+	fmt.Printf("filtered music:%d\n\n", len(filteredMusic))
+
+	return filteredMusic, nil
+}
+
+func findMusicForAddSongMusicList(ctx *gin.Context) {
+	data := model.RandMusic{}
+	ctx.ShouldBindJSON(&data)
+	music, err := findMusicForAddSongOfMusicList(data)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, music)
+}
+
+func findMusicForAddSongOfMusicList(data model.RandMusic) ([]model.Music, error) {
+	//workout_profile
+	var wpRepo = repository.NewWpRepository()
+	wp, _ := wpRepo.FindByWpid(data.Wpid)
+	fmt.Printf("wp:%v  \n\n", wp)
+	//infomation
+	lvl := wp.LevelExercise
+	duration := int(wp.Duration * 60)
+	// durationEx := wp.Duration
+	exeType := wp.ExerciseType
+	var musicType []int
+	for _, t := range wp.WorkoutMusictype {
+		musicType = append(musicType, t.Mtid)
+	}
+	fmt.Printf("infomation  lvl:%d  duration:%d  type:%s  musicType:%v  bpm:%d  \n\n", lvl, duration, exeType, musicType, bpm[lvl])
+
+	//music - level
+	musicRepo := repository.NewMusicRepository()
+	music, _ := musicRepo.FindAllMusicByLevel(bpm[lvl], musicType)
+	fmt.Printf("result music:%d\n\n", len(music))
+
+	// Find a new song
+	originalSong := data.MusicList[data.Index]
+	minBPM := int(float64(originalSong.Bpm) * 0.95)
+	maxBPM := int(float64(originalSong.Bpm) * 1.05)
 
 	var filteredMusic []model.Music
 	for _, m := range music {
