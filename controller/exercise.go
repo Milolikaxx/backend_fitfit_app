@@ -20,6 +20,7 @@ func NewExerciseController(router *gin.Engine) {
 		ping.PUT("/edithistory/:id", UpdateExerciseHis)
 		ping.GET("/searchbyday", FindByDay)
 		ping.GET("/last7day", GetLast7Day)
+		ping.GET("/getmonth", Get12Month)
 	}
 }
 
@@ -108,6 +109,17 @@ func GetLast7Day(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"error": err,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, exers)
+}
+
+func Get12Month(ctx *gin.Context) {
+	exers, err := exerServ.GetLast12Months()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}

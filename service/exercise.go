@@ -3,6 +3,7 @@ package service
 import (
 	"backend_fitfit_app/model"
 	"backend_fitfit_app/repository"
+	"sort"
 	"time"
 )
 
@@ -20,8 +21,8 @@ type exerService interface {
 	Save(exercise model.Exercise) int64
 	Update(exercise model.Exercise, id int) ([]model.Exercise, int64)
 	SearchByDay(keyword string) ([]model.Exercise, error)
-	// ExerciseLast7Day() ([]model.Exercise, error)
 	ExerciseLast7Day() ([]Day, error)
+	GetLast12Months() ([]MonthlyExerciseData, error)
 }
 
 func (exerServ) GetAllExer() ([]model.Exercise, error) {
@@ -72,14 +73,6 @@ func (exerServ) SearchByDay(keyword string) ([]model.Exercise, error) {
 	return exercise, nil
 }
 
-// func (exerServ) ExerciseLast7Day() ([]model.Exercise, error) {
-// 	exercise, err := exerciseRepo.FindExerciseLast7Days()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return exercise, nil
-// }
-
 type Day struct {
 	Date      string           `json:"date"`
 	Exercises []model.Exercise `json:"exercises"`
@@ -117,3 +110,57 @@ func (exerServ) ExerciseLast7Day() ([]Day, error) {
 	return result, nil
 }
 
+type MonthlyExerciseData struct {
+	MonthNumber   int              `json:"month_number"`
+	MonthName     string           `json:"month_name"`
+	ExerciseCount int              `json:"exercise_count"`
+	Exercises     []model.Exercise `json:"exercises"`
+}
+
+func (exerServ) GetLast12Months() ([]MonthlyExerciseData, error) {
+	exercises, err := exerciseRepo.FindExercisesLast12Months()
+	if err != nil {
+		return nil, err
+	}
+
+	monthlyData := make(map[string]*MonthlyExerciseData)
+	monthNames := []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+
+	// Initialize data for each of the last 12 months
+	for i := 0; i < 12; i++ {
+		date := time.Now().AddDate(0, -i, 0)
+		yearMonth := date.Format("2006-01")
+		monthNumber := date.Month()
+		monthName := monthNames[monthNumber-1]
+
+		monthlyData[yearMonth] = &MonthlyExerciseData{
+			MonthNumber:   int(monthNumber),
+			MonthName:     monthName,
+			ExerciseCount: 0,
+			Exercises:     []model.Exercise{},
+		}
+	}
+
+	// Populate the data with exercises
+	for _, exercise := range exercises {
+		yearMonth := exercise.Edate.Format("2006-01")
+		if data, exists := monthlyData[yearMonth]; exists {
+			data.ExerciseCount++
+			data.Exercises = append(data.Exercises, exercise)
+		}
+	}
+
+	var sortedMonthlyData []MonthlyExerciseData
+	for _, data := range monthlyData {
+		sortedMonthlyData = append(sortedMonthlyData, *data)
+	}
+
+	// Sort by year and month
+	sort.Slice(sortedMonthlyData, func(i, j int) bool {
+		yearMonthI, _ := time.Parse("January", sortedMonthlyData[i].MonthName)
+		yearMonthJ, _ := time.Parse("January", sortedMonthlyData[j].MonthName)
+		return yearMonthI.Before(yearMonthJ)
+	})
+
+	return sortedMonthlyData, nil
+}
