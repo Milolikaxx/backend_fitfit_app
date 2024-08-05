@@ -68,11 +68,13 @@ func (userServ) Login(user model.User) *model.User {
 			return usr
 		} else {
 			log.Println("รหัสผ่านไม่ตรง")
-			return nil
+			usr.Uid = 0
+			return usr
 		}
 	} else {
 		log.Panicln("ไม่พบอีเมล")
-		return nil
+		usr.Uid = 0
+		return usr
 	}
 }
 
