@@ -33,6 +33,7 @@ func getAllPlaylist(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, wps)
 }
+
 func getAllPlaylistByWpid(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	wps, err := playlistServ.GetAllPlaylistByWpid(id)
@@ -53,6 +54,7 @@ func getPlaylistByID(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, user)
 }
+
 func getPlaylistWithOutMusicByID(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	user, err := playlistServ.GetPlaylistWithOutMusicByID(id)
@@ -63,6 +65,7 @@ func getPlaylistWithOutMusicByID(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, user)
 }
+
 func SavePlaylist(ctx *gin.Context) {
 	playlist := model.Playlist{}
 	ctx.ShouldBindJSON(&playlist)
