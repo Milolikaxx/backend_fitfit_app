@@ -63,3 +63,5 @@ func (playlistDetailRepo) UpdatePlaylistDetail(playlistDe model.PlaylistDetail) 
 	}
 	return result.RowsAffected
 }
+
+
