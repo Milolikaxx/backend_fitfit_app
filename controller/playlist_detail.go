@@ -31,6 +31,7 @@ func NewPlaylistDetailController(router *gin.Engine) {
 		ping.GET("/delPlaylistDetail", delSongPlaylist)
 		ping.POST("/update", UpdatePlaylistDe)
 		ping.GET("/addmusic", addSongPlaylistSave)
+		ping.GET("/add", addSong)
 	}
 }
 
@@ -396,4 +397,23 @@ func AddSongPlaylistSave(data model.MusicForAddSongOfPlaylist) ([]model.Playlist
 	data.PlaylistDetail[data.IndexPL].Music = data.MusicForAdd[data.IndexMusic]
 	data.PlaylistDetail[data.IndexPL].Mid = data.MusicForAdd[data.IndexMusic].Mid
 	return data.PlaylistDetail, nil
+}
+
+func addSong(ctx *gin.Context) {
+	data := model.MusicForAddSong{}
+	ctx.ShouldBindJSON(&data)
+	music, err := AddSongMusicList(data)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, music)
+}
+
+func AddSongMusicList(data model.MusicForAddSong) ([]model.Music, error) {
+	if data.IndexMusiclist < 0 || data.IndexMusicAdd < 0 {
+		return nil, fmt.Errorf("index out of range")
+	}
+	data.MusicList[data.IndexMusiclist] = data.MusicForAdd[data.IndexMusicAdd]
+	return data.MusicList, nil
 }
