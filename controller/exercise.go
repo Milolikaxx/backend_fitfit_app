@@ -21,6 +21,7 @@ func NewExerciseController(router *gin.Engine) {
 		ping.GET("/searchbyday", FindByDay)
 		ping.GET("/last7day", GetLast7Day)
 		ping.GET("/getmonth", Get12Month)
+		ping.GET("/findbymonth", FindByMonth)
 	}
 }
 
@@ -124,4 +125,27 @@ func Get12Month(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, exers)
+}
+
+func FindByMonth(ctx *gin.Context) {
+	// Create a struct to hold the incoming JSON data
+	var requestData struct {
+		NumMonth string `json:"num_month"`
+	}
+
+	// Parse the JSON from the request body into the struct
+	if err := ctx.ShouldBindJSON(&requestData); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the service to search for exercises by month
+	exercises, err := exerServ.SearchByMonth(requestData.NumMonth)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Return the data in JSON format
+	ctx.JSON(http.StatusOK, exercises)
 }

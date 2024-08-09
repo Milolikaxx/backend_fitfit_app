@@ -23,6 +23,7 @@ type exerService interface {
 	SearchByDay(keyword string) ([]model.Exercise, error)
 	ExerciseLast7Day() ([]Day, error)
 	GetLast12Months() ([]MonthlyExerciseData, error)
+	SearchByMonth(numMonth string) ([]model.Exercise, error)
 }
 
 func (exerServ) GetAllExer() ([]model.Exercise, error) {
@@ -163,4 +164,12 @@ func (exerServ) GetLast12Months() ([]MonthlyExerciseData, error) {
 	})
 
 	return sortedMonthlyData, nil
+}
+
+func (exerServ) SearchByMonth(numMonth string) ([]model.Exercise, error) {
+	exercise, err := exerciseRepo.FindExerciseByMonth(numMonth)
+	if err != nil {
+		return nil, err
+	}
+	return exercise, nil
 }
